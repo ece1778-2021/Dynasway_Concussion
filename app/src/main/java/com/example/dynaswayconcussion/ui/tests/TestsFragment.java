@@ -16,20 +16,9 @@ import com.example.dynaswayconcussion.R;
 
 public class TestsFragment extends Fragment {
 
-    private TestsViewModel testsViewModel;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        testsViewModel =
-                new ViewModelProvider(this).get(TestsViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_tests, container, false);
-        final TextView textView = root.findViewById(R.id.text_dashboard);
-        testsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        return root;
+
+        return inflater.inflate(R.layout.fragment_tests, container, false);
     }
 }
