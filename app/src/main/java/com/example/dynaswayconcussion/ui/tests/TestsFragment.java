@@ -1,4 +1,4 @@
-package com.example.dynaswayconcussion.ui.dashboard;
+package com.example.dynaswayconcussion.ui.tests;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.dynaswayconcussion.R;
 
-public class DashboardFragment extends Fragment {
+public class TestsFragment extends Fragment {
 
-    private DashboardViewModel dashboardViewModel;
+    private TestsViewModel testsViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                new ViewModelProvider(this).get(DashboardViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        testsViewModel =
+                new ViewModelProvider(this).get(TestsViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_tests, container, false);
         final TextView textView = root.findViewById(R.id.text_dashboard);
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        testsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
