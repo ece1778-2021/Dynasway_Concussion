@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/navigation_test"
-        android:name="com.example.dynaswayconcussion.ui.tests.TestsFragment"
+        android:name="com.example.dynaswayconcussion.ui.tests.TestsSelectionFragment"
         android:label="@string/title_testing"
-        tools:layout="@layout/fragment_tests" />
+        tools:layout="@layout/fragment_tests_selection" />
 
     <fragment
         android:id="@+id/navigation_calendar"

@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="main_green">#66d999</color>
+    <color name="accent_green">#377854</color>
     <color name="main_gray">#4d4543</color>
     <color name="main_pink">#d971cd</color>
 

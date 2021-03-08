@@ -1,4 +1,4 @@
-package com.example.dynaswayconcussion.Tests;
+package com.example.dynaswayconcussion.Tests.StaticTest;
 
 
 import android.content.Context;
@@ -51,7 +51,6 @@ public class MotionSensor implements SensorEventListener {
             accelHistory.add(acceleration);
             generateRaw();
             generateAxisFiltered();
-
         }
     }
 
@@ -101,28 +100,6 @@ public class MotionSensor implements SensorEventListener {
 
         listener.onAxisFilteredMotionAvailable(accelFiltered, accelTotalFiltered);
 
-    }
-
-    private void generateTestResult()
-    {
-        double rawResult = calculateTestResult(RawTestHistory);
-        double filteredResult = calculateTestResult(FilteredTestHistory);
-
-        listener.onRawTestResultAvailable(rawResult);
-        listener.onFilteredTestResultAvailable(filteredResult);
-    }
-
-    private double calculateTestResult(List<Double> testHistory)
-    {
-        double squareSum = 0;
-        int n = testHistory.size();
-        for (int i=0; i<n; i++)
-        {
-            squareSum += pow(testHistory.get(i), 2);
-        }
-
-        double rms = sqrt(squareSum / (double)n);
-        return rms;
     }
 
     private double calculateTotalAccel(double[] accel)
