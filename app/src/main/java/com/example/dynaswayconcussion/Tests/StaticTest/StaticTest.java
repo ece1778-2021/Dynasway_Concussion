@@ -31,8 +31,8 @@ public class StaticTest implements ITest, IMotionSensorListener {
     }
 
     @Override
-    public void onTestResultAvailable() {
-
+    public double getResult() {
+        return finalResult;
     }
 
     public double calculateFinalResult()

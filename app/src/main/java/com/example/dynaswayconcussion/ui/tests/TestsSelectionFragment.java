@@ -38,19 +38,6 @@ public class TestsSelectionFragment extends Fragment {
             }
         });
 
-
-
-//        Button btnStaticTest = view.findViewById(R.id.btnStaticTest);
-//        btnStaticTest.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//
-//                FragmentTransaction fr = getFragmentManager().beginTransaction();
-//                fr.replace(R.id.nav_host_fragment, new StaticTestSelectionFragment());
-//                fr.commit();
-//            }
-//        });
-
         return view;
     }
 }

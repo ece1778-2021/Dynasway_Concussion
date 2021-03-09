@@ -4,5 +4,5 @@ public interface ITest {
 
     void startTest();
     void stopTest();
-    void onTestResultAvailable();
+    double getResult();
 }
