@@ -3,13 +3,14 @@ package com.example.dynaswayconcussion.Tests.DynamicTest;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.dynaswayconcussion.Tests.ITest;
 
-public class DynamicTest implements ITest, IStepCounterListener {
+public class DynamicTest implements ITest, IStepCounterListener, SensorEventListener {
 
     //Constants
     private static final String INFO_TAG = "[Dynamic testing info]";
@@ -52,6 +53,10 @@ public class DynamicTest implements ITest, IStepCounterListener {
         else
         {
             isSensorPresent = false;
+        }
+        if(isSensorPresent)
+        {
+            mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
         }
     }
 
