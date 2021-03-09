@@ -35,7 +35,7 @@ public class TestActivity extends AppCompatActivity {
 
     long startTime = 0;
     int delayDuration = 2000;
-    int testDuration = 10000;
+    int testDuration = 30000;
     boolean countdown;
 
     ITest test;
@@ -145,6 +145,6 @@ public class TestActivity extends AppCompatActivity {
     {
         test.stopTest();
         double result = test.getResult();
-        Toast.makeText(this, String.valueOf(result), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, String.valueOf(result), Toast.LENGTH_LONG).show();
     }
 }

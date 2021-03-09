@@ -76,22 +76,26 @@ public class TestInstructionsActivity extends AppCompatActivity {
 
         else if (testType == R.string.dynamic_test_regular)
         {
-
+            activityInstructions = "walk...";
         }
 
         else if (testType == R.string.dynamic_test_tandem)
         {
-
+            activityInstructions = "walk...";
         }
 
         else if (testType == R.string.dynamic_test_regular_dual_task)
         {
-
+            activityInstructions = "walk...";
+            cognetiveInstructions = MessageFormat.format("In your head, count numbers starting from {0}, " +
+                    "going down by {1}", startingNum, countdownNum);
         }
 
         else if (testType == R.string.dynamic_test_tandem_dual_task)
         {
-
+            activityInstructions = "walk...";
+            cognetiveInstructions = MessageFormat.format("In your head, count numbers starting from {0}, " +
+                    "going down by {1}", startingNum, countdownNum);
         }
 
         else
