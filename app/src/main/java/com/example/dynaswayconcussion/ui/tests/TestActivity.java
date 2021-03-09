@@ -34,7 +34,7 @@ public class TestActivity extends AppCompatActivity {
     Button btnCancelTest;
 
     long startTime = 0;
-    int delayDuration = 2000;
+    int delayDuration = 5000;
     int testDuration = 30000;
     boolean countdown;
 

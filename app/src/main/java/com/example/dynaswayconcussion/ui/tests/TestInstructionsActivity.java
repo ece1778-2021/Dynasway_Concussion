@@ -18,7 +18,7 @@ public class TestInstructionsActivity extends AppCompatActivity {
 
     int testType = -1;
     Random rand = new Random();
-    List<Integer> countdownNums = Arrays.asList(3, 7, 11, 13, 19);
+    List<Integer> countdownNums = Arrays.asList(7, 9, 13);
     int startingNum = rand.nextInt(700) + 300;
     int countdownNum = countdownNums.get(rand.nextInt(countdownNums.size()));
 
