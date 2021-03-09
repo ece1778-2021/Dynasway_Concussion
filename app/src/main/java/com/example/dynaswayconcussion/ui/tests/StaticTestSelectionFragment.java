@@ -24,11 +24,8 @@ public class StaticTestSelectionFragment extends Fragment {
         view.findViewById(R.id.cardViewStaticTestRegular).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,300);
-
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                intent.putExtra("test_type", getString(R.string.static_test_regular));
+                intent.putExtra("test_type", R.string.static_test_regular);
                 startActivity(intent);
             }
         });
@@ -36,11 +33,8 @@ public class StaticTestSelectionFragment extends Fragment {
         view.findViewById(R.id.cardViewStaticTestTandem).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,300);
-
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                intent.putExtra("test_type", getString(R.string.static_test_tandem));
+                intent.putExtra("test_type", R.string.static_test_tandem);
                 startActivity(intent);
             }
         });
@@ -48,11 +42,8 @@ public class StaticTestSelectionFragment extends Fragment {
         view.findViewById(R.id.cardViewStaticTestRegularDual).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,300);
-
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                intent.putExtra("test_type", getString(R.string.static_test_regular_dual_task));
+                intent.putExtra("test_type", R.string.static_test_regular_dual_task);
                 startActivity(intent);
             }
         });
@@ -60,16 +51,11 @@ public class StaticTestSelectionFragment extends Fragment {
         view.findViewById(R.id.cardViewStaticTestTandemDual).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,300);
-
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                intent.putExtra("test_type", getString(R.string.static_test_tandem_dual_task));
+                intent.putExtra("test_type", R.string.static_test_tandem_dual_task);
                 startActivity(intent);
             }
         });
-
-
 
         return view;
     }

@@ -1,5 +1,7 @@
 package com.example.dynaswayconcussion.Tests.StaticTest;
 
+import android.content.Context;
+
 import com.example.dynaswayconcussion.Tests.ITest;
 
 import java.util.ArrayList;
@@ -14,8 +16,8 @@ public class StaticTest implements ITest, IMotionSensorListener {
     private List<Double> _testHistory = new ArrayList<>();
     private double finalResult;
 
-    public StaticTest() {
-
+    public StaticTest(Context context) {
+        MotionSensor motionSensor = new MotionSensor(context, this);
     }
 
     public void startTest()
@@ -27,11 +29,12 @@ public class StaticTest implements ITest, IMotionSensorListener {
     public void stopTest()
     {
         _isRunning = false;
-        finalResult = calculateFinalResult();
+
     }
 
     @Override
     public double getResult() {
+        finalResult = calculateFinalResult();
         return finalResult;
     }
 

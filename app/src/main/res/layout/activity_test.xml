@@ -17,4 +17,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.4" />
+
+    <TextView
+        android:id="@+id/txtTestState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/txtTestTimer"
+        app:layout_constraintEnd_toEndOf="@+id/txtTestTimer"
+        app:layout_constraintStart_toStartOf="@+id/txtTestTimer" />
+
+    <Button
+        android:id="@+id/btnCancelTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#DC8787"
+        android:text="Cancel Test"
+        android:onClick="btnCancelTest_onClick"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/txtTestTimer"
+        app:layout_constraintStart_toStartOf="@+id/txtTestTimer"
+        app:layout_constraintTop_toBottomOf="@+id/txtTestTimer" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
