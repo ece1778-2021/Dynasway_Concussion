@@ -32,6 +32,7 @@ public class DynamicTest implements ITest, IStepCounterListener {
 
     //Test results related variables
     private int stepsTakenDuringTest = 0;
+    private double stepsPerSecondResult = 0.0;
 
     //System related variables
     Context ctx;
@@ -72,16 +73,16 @@ public class DynamicTest implements ITest, IStepCounterListener {
         if (current_task != null) {
             if (current_task.getStatus() == AsyncTask.Status.RUNNING
                     || current_task.getStatus() == AsyncTask.Status.PENDING) {
+                testStarted = false;
+                sensorIsCounting = false;
                 current_task.cancel(true);
-                //To return -1 when the test has failed
-                stepsTakenDuringTest = TEST_FAILED;
             }
         }
     }
 
     @Override
     public double getResult() {
-        return stepsTakenDuringTest;
+        return stepsPerSecondResult;
     }
 
     @Override
@@ -109,14 +110,12 @@ public class DynamicTest implements ITest, IStepCounterListener {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //inAnimation = new AlphaAnimation(0f, 1f);
             startTime = System.currentTimeMillis();
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            //startDynamicTestButton.setEnabled(true);
         }
 
         @Override
@@ -127,30 +126,29 @@ public class DynamicTest implements ITest, IStepCounterListener {
     }
 
     private void timedStepsFunction(long startTime) {
-        //long currentTime = System.currentTimeMillis();
-        //long timeElapsed = currentTime - startTime;
-        /*while (timeElapsed < SENSOR_MIN_ACTIVATION_TIME) {
-            timeElapsed = System.currentTimeMillis() - startTime;
-            stepsWhenTestStarted = currentSteps;
-        }*/
         while (testStarted && !sensorIsCounting) {
             stepsWhenTestStarted = currentSteps;
+            stepsTakenDuringTest = 0;
+            stepsPerSecondResult = 0.0;
             //TODO: beep when this loop is done to tell the use the test started
         }
-        startTime = System.currentTimeMillis();
-        long timeElapsed = System.currentTimeMillis() - startTime;
-        stepsWhenTestStarted = currentSteps;
-        while (timeElapsed < TEST_MIN_MILLIS) {
-            timeElapsed = System.currentTimeMillis() - startTime;
+        long testStartTime = System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
+        while (testStarted) {
             stepsTakenDuringTest = currentSteps - stepsWhenTestStarted;
+            currentTime = System.currentTimeMillis();
+            double secondsElapsed = ((currentTime - testStartTime) / 1000.0);
+            if (secondsElapsed != 0.0) {
+                stepsPerSecondResult = (currentSteps - stepsWhenTestStarted) / secondsElapsed;
+            }
         }
-        float secondsElapsed = (timeElapsed / 1000.0f);
+
         stepsTakenDuringTest = currentSteps - stepsWhenTestStarted;
-        String output = "Pace: 0 steps/s";
-        if (secondsElapsed > 0.0f) {
-            output = "Pace: " + String.valueOf(stepsTakenDuringTest / secondsElapsed) + " steps/s";
+        currentTime = System.currentTimeMillis();
+        double secondsElapsed = ((currentTime - testStartTime) / 1000.0);
+        if (secondsElapsed != 0.0) {
+            stepsPerSecondResult = (currentSteps - stepsWhenTestStarted) / secondsElapsed;
         }
-        //steps_during_test_display.setText(output);
 
         testStarted = false;
         sensorIsCounting = false;
