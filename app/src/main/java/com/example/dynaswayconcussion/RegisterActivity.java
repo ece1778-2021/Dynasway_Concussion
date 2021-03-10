@@ -16,6 +16,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -87,6 +88,11 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        imageLoadingHelper = new ImageLoadingHelper();
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
 
         CircularImageView profileImage = (CircularImageView)findViewById(R.id.inputProfilePicture);
         profileImage.setOnClickListener(new View.OnClickListener() {
@@ -242,6 +248,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private class CreateUserTask extends AsyncTask<Void, Void, Void> {
 
+        public String errorMessage = "";
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -255,30 +262,74 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            if (!errorMessage.equals("")) {
+                finishLoadingAnimDoToast(errorMessage);
+            }
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            createAccountUploadPicture();
+            createAccountUploadPicture(this);
             return null;
         }
+    }
+
+    private void finishLoadingAnimDoToast(String text) {
+        outAnimation = new AlphaAnimation(1f, 0f);
+        outAnimation.setDuration(200);
+        progressBarHolder.setAnimation(outAnimation);
+        progressBarHolder.setVisibility(View.GONE);
+        signUpButton.setEnabled(true);
+        Toast.makeText(RegisterActivity.this, text,
+                Toast.LENGTH_SHORT).show();
     }
 
     //Load all information from text fields, image bitmap and profile color, first create the
     //account with email and password while checking if the password and the confirmation are equal.
     //After that, upload the picture to Firebase Storage and upload all the user data on to Firestore
-    private void createAccountUploadPicture() {
+    private void createAccountUploadPicture(CreateUserTask task) {
         String email = signUpEmailField.getText().toString();
         String pass = signUpPasswordField.getText().toString();
         String confirmPass = signUpConfirmPasswordField.getText().toString();
+        String name = signUpNameField.getText().toString();
+        String surname = signUpSurnameField.getText().toString();
+        String age = signUpAgeField.getText().toString();
+        String sport = signUpSportField.getText().toString();
+        //String errorMessage = "Something went wrong with the registration";
+        boolean shouldReturn = false;
+        if (email.equals("")) {
+            task.errorMessage = "E-mail field can't be empty.";
+            shouldReturn = true;
+        }
+        else if (pass.equals("")) {
+            task.errorMessage = "Password field can't be empty.";
+            shouldReturn = true;
+        }
+        else if (confirmPass.equals("")) {
+            task.errorMessage = "Confirm password field can't be empty.";
+            shouldReturn = true;
+        }
+        else if (name.equals("")) {
+            task.errorMessage = "Name field can't be empty.";
+            shouldReturn = true;
+        }
+        else if (surname.equals("")) {
+            task.errorMessage = "Surname field can't be empty.";
+            shouldReturn = true;
+        }
+        else if (age.equals("")) {
+            task.errorMessage = "Age field can't be empty.";
+            shouldReturn = true;
+        }
+        else if (sport.equals("")) {
+            task.errorMessage = "Sport field can't be empty.";
+            shouldReturn = true;
+        }
         if (!pass.equals(confirmPass)) {
-            outAnimation = new AlphaAnimation(1f, 0f);
-            outAnimation.setDuration(200);
-            progressBarHolder.setAnimation(outAnimation);
-            progressBarHolder.setVisibility(View.GONE);
-            signUpButton.setEnabled(true);
-            Toast.makeText(RegisterActivity.this, "Passwords don't match.",
-                    Toast.LENGTH_SHORT).show();
+            task.errorMessage = "Password don't match.";
+            shouldReturn = true;
+        }
+        if (shouldReturn) {
             return;
         }
         mAuth.createUserWithEmailAndPassword(email, pass)
@@ -311,8 +362,6 @@ public class RegisterActivity extends AppCompatActivity {
                                             Log.d(INFO_TAG, "createUserWithEmail:success");
                                             createUserData(email, downloadUri.toString());
                                         } else {
-                                            Toast.makeText(RegisterActivity.this, "Failed to upload picture.",
-                                                    Toast.LENGTH_SHORT).show();
                                             try {
                                                 throw task.getException();
                                             } catch (Exception e) {
@@ -343,27 +392,27 @@ public class RegisterActivity extends AppCompatActivity {
                             catch (FirebaseAuthWeakPasswordException weakPassword)
                             {
                                 Log.d(INFO_TAG, "onComplete: weak_password");
-                                Toast.makeText(RegisterActivity.this, "Password is too weak.",
-                                        Toast.LENGTH_SHORT).show();
+                                /*Toast.makeText(RegisterActivity.this, "Password is too weak.",
+                                        Toast.LENGTH_SHORT).show();*/
                             }
                             // if user enters wrong password.
                             catch (FirebaseAuthInvalidCredentialsException malformedEmail)
                             {
                                 Log.d(INFO_TAG, "onComplete: malformed_email");
-                                Toast.makeText(RegisterActivity.this, "E-mail format is not correct.",
-                                        Toast.LENGTH_SHORT).show();
+                                /*Toast.makeText(RegisterActivity.this, "E-mail format is not correct.",
+                                        Toast.LENGTH_SHORT).show();*/
                             }
                             catch (FirebaseAuthUserCollisionException existEmail)
                             {
                                 Log.d(INFO_TAG, "onComplete: exist_email");
-                                Toast.makeText(RegisterActivity.this, "E-mail already exists.",
-                                        Toast.LENGTH_SHORT).show();
+                                /*Toast.makeText(RegisterActivity.this, "E-mail already exists.",
+                                        Toast.LENGTH_SHORT).show();*/
                             }
                             catch (Exception e)
                             {
                                 Log.d(INFO_TAG, "onComplete: " + e.getMessage());
-                                Toast.makeText(RegisterActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
+                                /*Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();*/
                             }
                             // If sign in fails, display a message to the user.
                             Log.w(INFO_TAG, "createUserWithEmail:failure", task.getException());
