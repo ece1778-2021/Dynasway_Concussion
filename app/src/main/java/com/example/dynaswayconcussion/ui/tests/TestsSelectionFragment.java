@@ -24,7 +24,6 @@ public class TestsSelectionFragment extends Fragment {
                 FragmentTransaction fr = getFragmentManager().beginTransaction();
                 fr.replace(R.id.nav_host_fragment, new StaticTestSelectionFragment()).addToBackStack( "backstack" );
                 fr.commit();
-
             }
         });
 
