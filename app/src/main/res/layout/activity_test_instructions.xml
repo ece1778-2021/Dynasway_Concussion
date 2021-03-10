@@ -13,14 +13,14 @@
         android:layout_margin="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/txtTestTitle">
 
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
             android:layout_gravity="center"
+            android:layout_margin="20dp"
             android:orientation="vertical">
 
             <TextView
@@ -57,12 +57,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cognetive Instructions: "
+                android:text="Cognitive Instructions: "
                 android:textStyle="bold"
                 android:layout_gravity="center"/>
 
             <TextView
-                android:id="@+id/txtTestCognetiveInstructions"
+                android:id="@+id/txtTestCognitiveInstructions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="[instructions here]"
@@ -103,5 +103,17 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5"/>
+
+    <TextView
+        android:id="@+id/txtTestTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="TextView"
+        android:textColor="@color/main_pink"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

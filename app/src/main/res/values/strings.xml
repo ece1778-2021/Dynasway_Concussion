@@ -4,15 +4,15 @@
     <string name="title_testing">Test</string>
     <string name="title_calendar">Calendar</string>
 
-    <string name="static_test_regular">static_regular</string>
-    <string name="static_test_tandem">static_tandem</string>
-    <string name="static_test_regular_dual_task">static_regular_dual</string>
-    <string name="static_test_tandem_dual_task">static_tandem_dual</string>
+    <string name="static_test_regular">Regular Standing</string>
+    <string name="static_test_tandem">Tandem Standing</string>
+    <string name="static_test_regular_dual_task">Dual Task Regular Standing</string>
+    <string name="static_test_tandem_dual_task">Dual Task Tandem Standing</string>
 
-    <string name="dynamic_test_regular">dynamic_regular</string>
-    <string name="dynamic_test_tandem">dynamic_tandem</string>
-    <string name="dynamic_test_regular_dual_task">dynamic_regular_dual</string>
-    <string name="dynamic_test_tandem_dual_task">dynamic_tandem_dual</string>
+    <string name="dynamic_test_regular">Regular Walking</string>
+    <string name="dynamic_test_tandem">Tandem Walking</string>
+    <string name="dynamic_test_regular_dual_task">Dual Task Regular Walking</string>
+    <string name="dynamic_test_tandem_dual_task">Dual Task Tandem Walking</string>
 
     <!--
     This string is used for square devices and overridden by hello_world in

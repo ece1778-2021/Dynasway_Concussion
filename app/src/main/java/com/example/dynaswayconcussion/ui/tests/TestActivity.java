@@ -3,6 +3,7 @@ package com.example.dynaswayconcussion.ui.tests;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.icu.text.UnicodeSetSpanner;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
@@ -22,20 +23,23 @@ import java.text.MessageFormat;
 
 public class TestActivity extends AppCompatActivity {
 
-    int TEST_STATE_COUNTDOWN = 0;
-    int TEST_STATE_RUNNING = 1;
-    int TEST_STATE_FINISHING = 2;
-    int TEST_STATE_FINISHED = 3;
+    int TEST_STATE_INITIALIZING = 0;
+    int TEST_STATE_COUNTDOWN = 1;
+    int TEST_STATE_RUNNING = 2;
+    int TEST_STATE_FINISHING = 3;
+    int TEST_STATE_FINISHED = 4;
 
     int testState = 0;
 
     TextView txtTestTimer;
     TextView txtTestState;
+    TextView txtTestCompleted;
     Button btnCancelTest;
+    Button btnReturn;
 
     long startTime = 0;
-    int delayDuration = 5000;
-    int testDuration = 30000;
+    int delayDuration = 2000;
+    int testDuration = 5000;
     boolean countdown;
 
     ITest test;
@@ -51,8 +55,15 @@ public class TestActivity extends AppCompatActivity {
         public void run() {
             long timeEllapsed = System.currentTimeMillis() - startTime;
             long timeRemaining = 0;
+            if (testState == TEST_STATE_INITIALIZING)
+            {
+                btnCancelTest.setVisibility(View.VISIBLE);
+                btnReturn.setVisibility(View.INVISIBLE);
+                txtTestCompleted.setVisibility(View.INVISIBLE);
+                testState= TEST_STATE_COUNTDOWN;
+                }
 
-            if (testState == TEST_STATE_COUNTDOWN)
+            else if (testState == TEST_STATE_COUNTDOWN)
             {
                 txtTestState.setText("Test starting in...");
                 txtTestTimer.setTextColor(getColor(R.color.main_pink));
@@ -78,9 +89,13 @@ public class TestActivity extends AppCompatActivity {
                     testState = TEST_STATE_FINISHING;
                 }
             }
+
             else if (testState == TEST_STATE_FINISHING)
             {
                 btnCancelTest.setVisibility(View.INVISIBLE);
+                btnReturn.setVisibility(View.VISIBLE);
+                txtTestCompleted.setVisibility(View.VISIBLE);
+
                 timeRemaining = 0;
                 onTestFinished();
                 testState = TEST_STATE_FINISHED;
@@ -106,7 +121,9 @@ public class TestActivity extends AppCompatActivity {
 
         txtTestTimer = findViewById(R.id.txtTestTimer);
         txtTestState = findViewById(R.id.txtTestState);
+        txtTestCompleted = findViewById(R.id.txtTestCompleted);
         btnCancelTest = findViewById(R.id.btnCancelTest);
+        btnReturn = findViewById(R.id.btnReturn);
 
         Intent intent = getIntent();
         int testType = intent.getIntExtra("test_type", 0);
@@ -128,7 +145,7 @@ public class TestActivity extends AppCompatActivity {
                 break;
         }
 
-        testState = TEST_STATE_COUNTDOWN;
+        testState = TEST_STATE_INITIALIZING;
         test.startTest();
 
         startTime = System.currentTimeMillis();
@@ -137,14 +154,26 @@ public class TestActivity extends AppCompatActivity {
 
     }
 
-    public void btnCancelTest_onClick(View view) {
-
-    }
-
     public void onTestFinished()
     {
         test.stopTest();
         double result = test.getResult();
         Toast.makeText(this, String.valueOf(result), Toast.LENGTH_LONG).show();
+        timerHandler.removeCallbacks(timerRunnable);
+    }
+
+    public void btnCancelTest_onClick(View view) {
+        timerHandler.removeCallbacks(timerRunnable);
+        Toast.makeText(this, "Test has been cancelled", Toast.LENGTH_SHORT).show();
+
+        Intent data = new Intent();
+        setResult(RESULT_CANCELED, data);
+        finish();
+    }
+
+    public void btnReturn_onClick(View view) {
+        Intent data = new Intent();
+        setResult(RESULT_OK, data);
+        finish();
     }
 }
