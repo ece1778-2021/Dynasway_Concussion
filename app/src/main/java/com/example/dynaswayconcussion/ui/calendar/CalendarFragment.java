@@ -133,19 +133,6 @@ public class CalendarFragment extends Fragment {
         //hiding the vertical grid lines, default true if not set
         xAxis.setDrawGridLines(false);
 
-        final ArrayList<String> xLabel = new ArrayList<>();
-        xLabel.add("Regular");
-        xLabel.add("Tandem");
-        xLabel.add("Regular-Dual");
-        xLabel.add("Tandem-Dual");
-
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return xLabel.get((int) value);
-            }
-        });
-
         YAxis leftAxis = barChart.getAxisLeft();
         //hiding the left y-axis line, default true if not set
         leftAxis.setDrawAxisLine(false);
