@@ -125,7 +125,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="5dp"
-                android:text="Regular Stance Cognetive Task"
+                android:text="Regular Stance Cognitive Task"
                 android:textAlignment="center" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -162,7 +162,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="5dp"
-                android:text="Tandem Stance Cognetive Task"
+                android:text="Tandem Stance Cognitive Task"
                 android:textAlignment="center" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
