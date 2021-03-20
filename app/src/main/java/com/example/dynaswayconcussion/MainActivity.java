@@ -20,6 +20,9 @@ import androidx.navigation.ui.NavigationUI;
 public class MainActivity extends AppCompatActivity {
 
     private final int STEP_COUNTER_PERMISSION_CODE = 0;
+    private final int CAMERA_PERMISSION_CODE = 1;
+    private final int EXTERNAL_STORAGE_PERMISSION_CODE = 2;
+    private final int AUDIO_PERMISSION_CODE = 3;
 
     //Firebase variables
     private FirebaseAuth mAuth;
@@ -40,17 +43,30 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        checkIfStepCounterPermissionsEnabled();
+        checkIfSensorsPermissionsEnabled();
     }
 
-        private void checkIfStepCounterPermissionsEnabled() {
+    private void checkIfSensorsPermissionsEnabled() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED){
             //ask for permission
             requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, STEP_COUNTER_PERMISSION_CODE);
         }
-        /*else {
-            startDynamicTestButton.setEnabled(true);
-        }*/
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED){
+            //ask for permission
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+        }
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+            //ask for permission
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CODE);
+        }
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+            //ask for permission
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CODE);
+        }
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED){
+            //ask for permission
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_PERMISSION_CODE);
+        }
     }
 
     @Override
@@ -78,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         boolean isStepCountingGranted = false;
+        boolean isCameraPermissionGranted = false;
+        boolean isExternalStoragePermissionGranted = false;
+        boolean isAudioPermissionGranted = false;
         switch (requestCode) {
             case STEP_COUNTER_PERMISSION_CODE:
                 // If request is cancelled, the result arrays are empty.
@@ -88,15 +107,56 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     // Permission is granted. Continue the action or workflow
-                    // in your app.
-                    /*if (isStepCountingGranted) {
-                        startDynamicTestButton.setEnabled(true);
-                    }
-                    else {
-                        checkIfStepCounterPermissionsEnabled();
-                    }*/
                     if (!isStepCountingGranted) {
-                        checkIfStepCounterPermissionsEnabled();
+                        checkIfSensorsPermissionsEnabled();
+                    }
+                } else {
+                    Toast.makeText(this, "If the permissions aren't enabled, the test can't be done", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            case CAMERA_PERMISSION_CODE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                            isCameraPermissionGranted = true;
+                        }
+                    }
+                    // Permission is granted. Continue the action or workflow
+                    if (!isCameraPermissionGranted) {
+                        checkIfSensorsPermissionsEnabled();
+                    }
+                } else {
+                    Toast.makeText(this, "If the permissions aren't enabled, the test can't be done", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            case EXTERNAL_STORAGE_PERMISSION_CODE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                            isExternalStoragePermissionGranted = true;
+                        }
+                    }
+                    // Permission is granted. Continue the action or workflow
+                    if (!isExternalStoragePermissionGranted) {
+                        checkIfSensorsPermissionsEnabled();
+                    }
+                } else {
+                    Toast.makeText(this, "If the permissions aren't enabled, the test can't be done", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            case AUDIO_PERMISSION_CODE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                            isAudioPermissionGranted = true;
+                        }
+                    }
+                    // Permission is granted. Continue the action or workflow
+                    if (!isAudioPermissionGranted) {
+                        checkIfSensorsPermissionsEnabled();
                     }
                 } else {
                     Toast.makeText(this, "If the permissions aren't enabled, the test can't be done", Toast.LENGTH_SHORT).show();

@@ -38,8 +38,8 @@ public class TestActivity extends AppCompatActivity {
     Button btnReturn;
 
     long startTime = 0;
-    int delayDuration = 2000;
-    int testDuration = 5000;
+    int delayDuration = 5000;
+    int testDuration = 20000;
     boolean countdown;
 
     ITest test;

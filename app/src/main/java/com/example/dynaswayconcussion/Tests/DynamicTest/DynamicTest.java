@@ -148,12 +148,12 @@ public class DynamicTest implements ITest, IStepCounterListener, SensorEventList
             }
         }
 
-        stepsTakenDuringTest = currentSteps - stepsWhenTestStarted;
+        /*stepsTakenDuringTest = currentSteps - stepsWhenTestStarted;
         currentTime = System.currentTimeMillis();
         double secondsElapsed = ((currentTime - testStartTime) / 1000.0);
         if (secondsElapsed != 0.0) {
             stepsPerSecondResult = (currentSteps - stepsWhenTestStarted) / secondsElapsed;
-        }
+        }*/
 
         testStarted = false;
         sensorIsCounting = false;
