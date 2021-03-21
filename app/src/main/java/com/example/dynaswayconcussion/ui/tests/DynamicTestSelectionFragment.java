@@ -24,8 +24,8 @@ public class DynamicTestSelectionFragment extends Fragment {
         view.findViewById(R.id.cardViewDynamicTestRegular).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
+                Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
+                //Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
                 intent.putExtra("test_type", R.string.dynamic_test_regular);
                 startActivity(intent);
             }
@@ -34,8 +34,8 @@ public class DynamicTestSelectionFragment extends Fragment {
         view.findViewById(R.id.cardViewDynamicTestTandem).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
+                Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
+                //Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
                 intent.putExtra("test_type", R.string.dynamic_test_tandem);
                 startActivity(intent);
             }
@@ -44,8 +44,8 @@ public class DynamicTestSelectionFragment extends Fragment {
         view.findViewById(R.id.cardViewDynamicTestRegularDual).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
+                Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
+                //Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
                 intent.putExtra("test_type", R.string.dynamic_test_regular_dual_task);
                 startActivity(intent);
             }
@@ -54,8 +54,8 @@ public class DynamicTestSelectionFragment extends Fragment {
         view.findViewById(R.id.cardViewDynamicTestTandemDual).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
+                Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
+                //Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
                 intent.putExtra("test_type", R.string.dynamic_test_tandem_dual_task);
                 startActivity(intent);
             }

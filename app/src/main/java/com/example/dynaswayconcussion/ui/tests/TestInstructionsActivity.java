@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.dynaswayconcussion.R;
+import com.example.dynaswayconcussion.Tests.DynamicTest.camera.CameraActivity;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -28,6 +29,8 @@ public class TestInstructionsActivity extends AppCompatActivity {
 
     TextView txtActivityInstructions;
     TextView txtCognitiveInstructions;
+
+    boolean isDynamicTest = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +90,7 @@ public class TestInstructionsActivity extends AppCompatActivity {
                     "Walk as you normally would for the entire duration of the test. " +
                     "The test starts 5 seconds after the button is pressed and lasts for 30 seconds. " +
                     "The start and end of the test are announced with a beep";
+            isDynamicTest = true;
         }
 
         else if (testType == R.string.dynamic_test_tandem)
@@ -95,6 +99,7 @@ public class TestInstructionsActivity extends AppCompatActivity {
                     "Place the heel of your front foot directly in front of the toe of your back foot for the entire duration of the test. " +
                     "The test starts 5 seconds after the button is pressed and lasts for 30 seconds. " +
                     "The start and end of the test are announced with a beep";
+            isDynamicTest = true;
         }
 
         else if (testType == R.string.dynamic_test_regular_dual_task)
@@ -106,6 +111,7 @@ public class TestInstructionsActivity extends AppCompatActivity {
 
             cognitiveInstructions = MessageFormat.format("In your head, count numbers starting from {0}, " +
                     "going down by {1}", startingNum, countdownNum);
+            isDynamicTest = true;
         }
 
         else if (testType == R.string.dynamic_test_tandem_dual_task)
@@ -117,6 +123,7 @@ public class TestInstructionsActivity extends AppCompatActivity {
 
             cognitiveInstructions = MessageFormat.format("In your head, count numbers starting from {0}, " +
                     "going down by {1}", startingNum, countdownNum);
+            isDynamicTest = true;
         }
 
         else
@@ -133,14 +140,26 @@ public class TestInstructionsActivity extends AppCompatActivity {
     }
 
     public void btnBaselineTest_onClick(View view) {
-        Intent intent = new Intent(this, TestActivity.class);
+        Intent intent;
+        if (isDynamicTest) {
+            intent = new Intent(this, CameraActivity.class);
+        }
+        else {
+            intent = new Intent(this, TestActivity.class);
+        }
         intent.putExtra("test_type", testType);
         intent.putExtra("is_baseline", true);
         startActivityForResult(intent, RUN_STATIC_TEST);
     }
 
     public void btnPostInjuryTest_onClick(View view) {
-        Intent intent = new Intent(this, TestActivity.class);
+        Intent intent;
+        if (isDynamicTest) {
+            intent = new Intent(this, CameraActivity.class);
+        }
+        else {
+            intent = new Intent(this, TestActivity.class);
+        }
         intent.putExtra("test_type", testType);
         intent.putExtra("is_baseline", false);
         startActivityForResult(intent, RUN_DYNAMIC_TEST);
