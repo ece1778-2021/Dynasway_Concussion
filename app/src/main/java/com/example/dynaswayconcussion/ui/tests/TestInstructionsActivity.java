@@ -1,12 +1,16 @@
 package com.example.dynaswayconcussion.ui.tests;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.dynaswayconcussion.R;
 import com.example.dynaswayconcussion.Tests.DynamicTest.camera.CameraActivity;
@@ -41,14 +45,15 @@ public class TestInstructionsActivity extends AppCompatActivity {
         txtCognitiveInstructions = findViewById(R.id.txtTestCognitiveInstructions);
 
         testType = getIntent().getIntExtra("test_type", -1);
-        String title = getString(testType);
+        int testTypeName = getIntent().getIntExtra("test_type_name", -1);
+        String title = getString(testTypeName);
         TextView txtTitle = findViewById(R.id.txtTestTitle);
         txtTitle.setText(title);
 
         String activityInstructions = "";
         String cognitiveInstructions = "None";
 
-        if (testType == R.string.static_test_regular)
+        if (testType == R.string.static_test_regular_constant)
         {
             activityInstructions = "Place the phone in the waistband of your pants. " +
                     "Try to remain as still as possible with your feet shoulder width apart. " +
@@ -56,7 +61,7 @@ public class TestInstructionsActivity extends AppCompatActivity {
                     "The start and end of the test are announced with a beep.";
         }
 
-        else if (testType == R.string.static_test_tandem)
+        else if (testType == R.string.static_test_tandem_constant)
         {
             activityInstructions = "Place the phone in the waistband of your pants. " +
                     "Try to remain as still as possible with one toe touching the heel of the opposite foot. " +
@@ -64,7 +69,7 @@ public class TestInstructionsActivity extends AppCompatActivity {
                     "The start and end of the test are announced with a beep.";
         }
 
-        else if (testType == R.string.static_test_regular_dual_task)
+        else if (testType == R.string.static_test_regular_dual_task_constant)
         {
             activityInstructions = "Place the phone in the waistband of your pants. " +
                     "Try to remain as still as possible with one toe touching the heel of the opposite foot. " +
@@ -74,7 +79,7 @@ public class TestInstructionsActivity extends AppCompatActivity {
                     "going down by {1}", startingNum, countdownNum);
         }
 
-        else if (testType == R.string.static_test_tandem_dual_task)
+        else if (testType == R.string.static_test_tandem_dual_task_constant)
         {
             activityInstructions = "Place the phone in the waistband of your pants. " +
                     "Try to remain as still as possible with one toe touching the heel of the opposite foot. " +
@@ -84,42 +89,42 @@ public class TestInstructionsActivity extends AppCompatActivity {
                     "going down by {1}", startingNum, countdownNum);
         }
 
-        else if (testType == R.string.dynamic_test_regular)
+        else if (testType == R.string.dynamic_test_regular_constant)
         {
-            activityInstructions = "Place the phone in the pocket or waistband of your pants. " +
-                    "Walk as you normally would for the entire duration of the test. " +
-                    "The test starts 5 seconds after the button is pressed and lasts for 30 seconds. " +
-                    "The start and end of the test are announced with a beep";
+            activityInstructions = "Place the phone in a position where the camera will be able to see " +
+                    "a space of about 3 meters, and record the video inside the app or through the phone's camera app and then select it from the gallery. " +
+                    "You will need to start walking for three to five steps before entering the camera's view, and continue walking until you're " +
+                    "outside of the camera's view. A confirmation will be shown in case the video is incorrect.";
             isDynamicTest = true;
         }
 
-        else if (testType == R.string.dynamic_test_tandem)
+        else if (testType == R.string.dynamic_test_tandem_constant)
         {
-            activityInstructions = "Place the phone in the pocket or waistband of your pants. " +
-                    "Place the heel of your front foot directly in front of the toe of your back foot for the entire duration of the test. " +
-                    "The test starts 5 seconds after the button is pressed and lasts for 30 seconds. " +
-                    "The start and end of the test are announced with a beep";
+            activityInstructions = "Place the phone in a position where the camera will be able to see " +
+                    "a space of about 3 meters, and record the video inside the app or through the phone's camera app and then select it from the gallery. " +
+                    "You will need to start walking for three to five steps before entering the camera's view, and continue walking until you're " +
+                    "outside of the camera's view. A confirmation will be shown in case the video is incorrect.";
             isDynamicTest = true;
         }
 
-        else if (testType == R.string.dynamic_test_regular_dual_task)
+        else if (testType == R.string.dynamic_test_regular_dual_task_constant)
         {
-            activityInstructions = "Place the phone in the pocket or waistband of your pants. " +
-                    "Walk as you normally would for the entire duration of the test. " +
-                    "The test starts 5 seconds after the button is pressed and lasts for 30 seconds. " +
-                    "The start and end of the test are announced with a beep";
+            activityInstructions = "Place the phone in a position where the camera will be able to see " +
+                    "a space of about 3 meters, and record the video inside the app or through the phone's camera app and then select it from the gallery. " +
+                    "You will need to start walking for three to five steps before entering the camera's view, and continue walking until you're " +
+                    "outside of the camera's view. A confirmation will be shown in case the video is incorrect.";
 
             cognitiveInstructions = MessageFormat.format("In your head, count numbers starting from {0}, " +
                     "going down by {1}", startingNum, countdownNum);
             isDynamicTest = true;
         }
 
-        else if (testType == R.string.dynamic_test_tandem_dual_task)
+        else if (testType == R.string.dynamic_test_tandem_dual_task_constant)
         {
-            activityInstructions = "Place the phone in the pocket or waistband of your pants. " +
-                    "Walk as you normally would for the entire duration of the test. " +
-                    "The test starts 5 seconds after the button is pressed and lasts for 30 seconds. " +
-                    "The start and end of the test are announced with a beep";
+            activityInstructions = "Place the phone in a position where the camera will be able to see " +
+                    "a space of about 3 meters, and record the video inside the app or through the phone's camera app and then select it from the gallery. " +
+                    "You will need to start walking for three to five steps before entering the camera's view, and continue walking until you're " +
+                    "outside of the camera's view. A confirmation will be shown in case the video is incorrect once it has been recorded or selected.";
 
             cognitiveInstructions = MessageFormat.format("In your head, count numbers starting from {0}, " +
                     "going down by {1}", startingNum, countdownNum);
@@ -129,6 +134,8 @@ public class TestInstructionsActivity extends AppCompatActivity {
         else
         {
             try {
+                Toast.makeText(TestInstructionsActivity.this, "Issue when loading test.",
+                        Toast.LENGTH_SHORT).show();
                 throw new Exception("Test type not recognized!");
             } catch (Exception e) {
                 e.printStackTrace();

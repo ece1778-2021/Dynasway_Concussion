@@ -26,7 +26,8 @@ public class DynamicTestSelectionFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
                 //Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
-                intent.putExtra("test_type", R.string.dynamic_test_regular);
+                intent.putExtra("test_type", R.string.dynamic_test_regular_constant);
+                intent.putExtra("test_type_name", R.string.dynamic_test_regular);
                 startActivity(intent);
             }
         });
@@ -36,7 +37,8 @@ public class DynamicTestSelectionFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
                 //Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
-                intent.putExtra("test_type", R.string.dynamic_test_tandem);
+                intent.putExtra("test_type", R.string.dynamic_test_tandem_constant);
+                intent.putExtra("test_type_name", R.string.dynamic_test_tandem);
                 startActivity(intent);
             }
         });
@@ -46,7 +48,8 @@ public class DynamicTestSelectionFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
                 //Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
-                intent.putExtra("test_type", R.string.dynamic_test_regular_dual_task);
+                intent.putExtra("test_type", R.string.dynamic_test_regular_dual_task_constant);
+                intent.putExtra("test_type_name", R.string.dynamic_test_regular_dual_task);
                 startActivity(intent);
             }
         });
@@ -56,7 +59,8 @@ public class DynamicTestSelectionFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
                 //Intent intent = new Intent(getActivity().getApplicationContext(), CameraActivity.class);
-                intent.putExtra("test_type", R.string.dynamic_test_tandem_dual_task);
+                intent.putExtra("test_type", R.string.dynamic_test_tandem_dual_task_constant);
+                intent.putExtra("test_type_name", R.string.dynamic_test_tandem_dual_task);
                 startActivity(intent);
             }
         });

@@ -1,5 +1,6 @@
 package com.example.dynaswayconcussion.Tests.DynamicTest.camera;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -9,7 +10,11 @@ import com.daasuu.camerarecorder.CameraRecorder;
 import com.daasuu.camerarecorder.CameraRecorderBuilder;
 import com.daasuu.camerarecorder.LensFacing;
 import com.example.dynaswayconcussion.R;
+import com.example.dynaswayconcussion.ui.tests.TestInstructionsActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.Manifest;
@@ -18,6 +23,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.opengl.GLException;
@@ -73,6 +79,7 @@ public class CameraActivity extends AppCompatActivity {
     FrameLayout progressBarHolder;
     private ImageView recordBtn;
     private ImageView flashBtn;
+    private ImageView galleryButton;
 
     protected LensFacing lensFacing = LensFacing.FRONT;
     protected int cameraWidth = 1280;
@@ -86,11 +93,19 @@ public class CameraActivity extends AppCompatActivity {
 
     private final int EXTERNAL_STORAGE_PERMISSION_CODE = 2;
 
+    String testType;
+    boolean is_baseline;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         getSupportActionBar().hide();
+
+        int test_code = getIntent().getIntExtra("test_type", -1);
+        testType = getString(test_code);
+        is_baseline = getIntent().getBooleanExtra("is_baseline", false);
+
         checkIfSensorsPermissionsEnabled();
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -110,13 +125,14 @@ public class CameraActivity extends AppCompatActivity {
                 recordBtn.setImageResource(R.drawable.start_recording_icon);
                 isRecording = false;
                 new AlertDialog.Builder(this)
-                        .setTitle("Title")
-                        .setMessage("Do you really want to whatever?")
+                        .setTitle("Upload video")
+                        .setMessage("Do you really want to upload the recorded video?")
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new UploadVideoTask(filepath).execute();
+                                uploadTestToFirebase(is_baseline, System.currentTimeMillis(), testType, filepath);
+                                //new UploadVideoTask(filepath, testType, is_baseline).execute();
                             }})
                         .setNegativeButton(android.R.string.no, null).show();
             }
@@ -158,9 +174,19 @@ public class CameraActivity extends AppCompatActivity {
             });
         });
 
+        galleryButton = findViewById(R.id.video_from_gallery_button);
+        galleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent pickVideo = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                recordBtn.setEnabled(false);
+                galleryButton.setEnabled(false);
+                startActivityForResult(pickVideo , 1);
+            }
+        });
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        startVideoCaptureOrGallery(this);
     }
 
     @Override
@@ -387,9 +413,15 @@ public class CameraActivity extends AppCompatActivity {
 
         String finalFilePath = "";
         int uploadResult = 0;
+        String testType;
+        boolean is_baseline;
+        String testUID;
 
-        public UploadVideoTask(String _finalFilePath) {
+        public UploadVideoTask(String _finalFilePath, String _testType, boolean _is_baseline, String _testUID) {
             this.finalFilePath = _finalFilePath;
+            this.testType = _testType;
+            this.is_baseline = _is_baseline;
+            this.testUID = _testUID;
         }
 
         @Override
@@ -419,24 +451,37 @@ public class CameraActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
             recordBtn.setEnabled(true);
+            galleryButton.setEnabled(true);
+            Log.i("CAMERA_INFO", "Uploaded to server");
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            uploadResult = upLoadToServer(this.finalFilePath);
+            this.uploadResult = upLoadToServer(this.finalFilePath, this.testUID, this.is_baseline, System.currentTimeMillis());
             return null;
         }
     }
 
-    public int upLoadToServer(String sourceFileUri) {
+    public void uploadTestToFirebase(boolean is_baseline, long timestamp, String test_type, String fileURI) {
         Map<String, Object> data = new HashMap<>();
-        data.put("name", "Tokyo");
-        data.put("country", "Japan");
+        data.put("is_baseline", is_baseline);
+        data.put("test_type", test_type);
+        data.put("timestamp", timestamp);
+        data.put("user_uid", mAuth.getUid());
+        data.put("value", -1);
+        db.collection("test_results").add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+                new UploadVideoTask(fileURI, test_type, is_baseline, task.getResult().getId()).execute();
+                //int resultCode = upLoadToServer(fileURI, task.getResult().getId(), is_baseline, timestamp);
+            }
+        });
+    }
 
-
+    public int upLoadToServer(String sourceFileUri, String testUID, boolean _is_baseline, long timestamp) {
         String upLoadServerUri = "http://72.137.116.234:40000";
         // String [] string = sourceFileUri;
-        String fileName = mAuth.getUid() + "_" + System.currentTimeMillis() + ".mp4";
+        String fileName = testUID + "_" + timestamp + ".mp4";
 
         HttpURLConnection conn = null;
         DataOutputStream dos = null;
@@ -527,4 +572,74 @@ public class CameraActivity extends AppCompatActivity {
         return serverResponseCode;  // like 200 (Ok)
 
     } // end upLoad2Server
+
+    //Create a dialog with three options: take photo with camera, load photo from gallery or cancel
+    private void startVideoCaptureOrGallery(Context context) {
+        final CharSequence[] options = { "Record video for test", "Choose video from Gallery","Cancel" };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Choose how to send the video");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+
+                if (options[item].equals("Take video for test")) {
+                    dialog.dismiss();
+
+                } else if (options[item].equals("Choose video from Gallery")) {
+                    Intent pickVideo = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                    recordBtn.setEnabled(false);
+                    galleryButton.setEnabled(false);
+                    startActivityForResult(pickVideo , 1);
+
+                } else if (options[item].equals("Cancel")) {
+                    CameraActivity.this.finish();
+                }
+            }
+        });
+        builder.show();
+    }
+
+    //When a button is pressed on the pop up photo selection view, several things can be done.
+    //Once the picture has either been taken or selected from gallery, this callback is called
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_CANCELED) {
+            switch (requestCode) {
+                case 1:
+                    if (resultCode == RESULT_OK && data != null) {
+                        //Load a picture from a path from gallery
+                        Uri selectedVideo = data.getData();
+                        String[] filePathColumn = {MediaStore.Video.Media.DATA};
+                        if (selectedVideo != null) {
+                            Cursor cursor = getContentResolver().query(selectedVideo,
+                                    filePathColumn, null, null, null);
+                            if (cursor != null) {
+                                cursor.moveToFirst();
+
+                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                                String videoPath = cursor.getString(columnIndex);
+                                new AlertDialog.Builder(this)
+                                        .setTitle("Upload video")
+                                        .setMessage("Do you really want to upload the selected video?")
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                uploadTestToFirebase(is_baseline, System.currentTimeMillis(), testType, videoPath);
+                                            }})
+                                        .setNegativeButton(android.R.string.no, null).show();
+                                cursor.close();
+                                Log.i("CAMERA_INFO", "Loaded video from gallery");
+                            }
+                        }
+
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }

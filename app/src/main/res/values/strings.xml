@@ -14,6 +14,16 @@
     <string name="dynamic_test_regular_dual_task">Dual Task Regular Walking</string>
     <string name="dynamic_test_tandem_dual_task">Dual Task Tandem Walking</string>
 
+    <string name="static_test_regular_constant">REGULAR_STANDING</string>
+    <string name="static_test_tandem_constant">TANDEM_STANDING</string>
+    <string name="static_test_regular_dual_task_constant">DUAL_TASK_REGULAR_STANDING</string>
+    <string name="static_test_tandem_dual_task_constant">DUAL_TASK_TANDEM_STANDING</string>
+
+    <string name="dynamic_test_regular_constant">REGULAR_WALKING</string>
+    <string name="dynamic_test_tandem_constant">TANDEM_WALKING</string>
+    <string name="dynamic_test_regular_dual_task_constant">DUAL_TASK_REGULAR_WALKING</string>
+    <string name="dynamic_test_tandem_dual_task_constant">DUAL_TASK_TANDEM_WALKING</string>
+
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.

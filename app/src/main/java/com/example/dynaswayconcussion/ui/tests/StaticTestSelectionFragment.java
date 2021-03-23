@@ -25,7 +25,8 @@ public class StaticTestSelectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                intent.putExtra("test_type", R.string.static_test_regular);
+                intent.putExtra("test_type", R.string.static_test_regular_constant);
+                intent.putExtra("test_type_name", R.string.static_test_regular);
                 startActivity(intent);
             }
         });
@@ -34,7 +35,8 @@ public class StaticTestSelectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                intent.putExtra("test_type", R.string.static_test_tandem);
+                intent.putExtra("test_type", R.string.static_test_tandem_constant);
+                intent.putExtra("test_type_name", R.string.static_test_tandem);
                 startActivity(intent);
             }
         });
@@ -43,7 +45,8 @@ public class StaticTestSelectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                intent.putExtra("test_type", R.string.static_test_regular_dual_task);
+                intent.putExtra("test_type", R.string.static_test_regular_dual_task_constant);
+                intent.putExtra("test_type_name", R.string.static_test_regular_dual_task);
                 startActivity(intent);
             }
         });
@@ -52,7 +55,8 @@ public class StaticTestSelectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), TestInstructionsActivity.class);
-                intent.putExtra("test_type", R.string.static_test_tandem_dual_task);
+                intent.putExtra("test_type", R.string.static_test_tandem_dual_task_constant);
+                intent.putExtra("test_type_name", R.string.static_test_tandem_dual_task);
                 startActivity(intent);
             }
         });

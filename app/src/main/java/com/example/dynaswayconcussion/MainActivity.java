@@ -17,12 +17,15 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     private final int STEP_COUNTER_PERMISSION_CODE = 0;
     private final int CAMERA_PERMISSION_CODE = 1;
     private final int EXTERNAL_STORAGE_PERMISSION_CODE = 2;
     private final int AUDIO_PERMISSION_CODE = 3;
+    private final int DEFAULT_PERMISSION_CODE = 4;
 
     //Firebase variables
     private FirebaseAuth mAuth;
@@ -47,26 +50,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkIfSensorsPermissionsEnabled() {
+        ArrayList<String> requestedPermissions = new ArrayList<String>();
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED){
             //ask for permission
-            requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, STEP_COUNTER_PERMISSION_CODE);
+            //requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, STEP_COUNTER_PERMISSION_CODE);
+            requestedPermissions.add(Manifest.permission.ACTIVITY_RECOGNITION);
         }
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED){
             //ask for permission
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+            //requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+            requestedPermissions.add(Manifest.permission.CAMERA);
         }
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
             //ask for permission
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CODE);
+            //requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CODE);
+            requestedPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
             //ask for permission
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CODE);
+            //requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CODE);
+            requestedPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED){
             //ask for permission
-            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_PERMISSION_CODE);
+            //requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_PERMISSION_CODE);
+            requestedPermissions.add(Manifest.permission.RECORD_AUDIO);
         }
+        requestPermissions((String[]) requestedPermissions.toArray(), AUDIO_PERMISSION_CODE);
     }
 
     @Override

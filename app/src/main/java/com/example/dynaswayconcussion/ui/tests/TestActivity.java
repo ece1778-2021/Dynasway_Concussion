@@ -131,16 +131,16 @@ public class TestActivity extends AppCompatActivity {
 
         switch (testType)
         {
-            case R.string.static_test_regular:
-            case R.string.static_test_tandem:
-            case R.string.static_test_regular_dual_task:
-            case R.string.static_test_tandem_dual_task:
+            case R.string.static_test_regular_constant:
+            case R.string.static_test_tandem_constant:
+            case R.string.static_test_regular_dual_task_constant:
+            case R.string.static_test_tandem_dual_task_constant:
                 test = new StaticTest(this);
                 break;
-            case R.string.dynamic_test_regular:
-            case R.string.dynamic_test_tandem:
-            case R.string.dynamic_test_regular_dual_task:
-            case R.string.dynamic_test_tandem_dual_task:
+            case R.string.dynamic_test_regular_constant:
+            case R.string.dynamic_test_tandem_constant:
+            case R.string.dynamic_test_regular_dual_task_constant:
+            case R.string.dynamic_test_tandem_dual_task_constant:
                 test = new DynamicTest(this);
                 break;
         }
