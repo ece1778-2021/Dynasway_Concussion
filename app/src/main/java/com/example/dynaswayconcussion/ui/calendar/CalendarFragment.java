@@ -230,6 +230,9 @@ public class CalendarFragment extends Fragment {
                     Toast.LENGTH_SHORT).show();
         }
 
+        Log.i("CALENDAR_INFO", "Start time in millis: " + startTimeMillis);
+        Log.i("CALENDAR_INFO", "End time in millis: " + endTimeMillis);
+
         for (int i = 0; i < 5; i++) {
             baselineStatic[i] = 0.0;
             resultsStatic[i] = 0.0;
@@ -250,7 +253,7 @@ public class CalendarFragment extends Fragment {
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 int count = 0;
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                    Log.d("CALENDAR_INFO", document.getId() + " => " + document.getData());
+                    Log.i("CALENDAR_INFO", document.getId() + " => " + document.getData());
                     double testResult = document.getDouble("value");
                     boolean isBaseline = document.getBoolean("is_baseline");
                     boolean isFromUser = document.getString("user_uid").equals(mAuth.getCurrentUser().getUid());
@@ -273,7 +276,7 @@ public class CalendarFragment extends Fragment {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                             for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                                Log.d("CALENDAR_INFO", document.getId() + " => " + document.getData());
+                                Log.i("CALENDAR_INFO", document.getId() + " => " + document.getData());
                                 double testResult = document.getDouble("value");
                                 boolean isBaseline = document.getBoolean("is_baseline");
                                 boolean isFromUser = document.getString("user_uid").equals(mAuth.getCurrentUser().getUid());

@@ -197,7 +197,7 @@ public class TestActivity extends AppCompatActivity {
         data.put("test_type", test_type);
         data.put("timestamp", System.currentTimeMillis());
         data.put("user_uid", mAuth.getUid());
-        data.put("value", -1);
+        data.put("value", result);
         Context toastContext = this;
         db.collection("test_results").add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
             @Override
