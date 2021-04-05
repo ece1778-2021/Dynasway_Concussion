@@ -122,14 +122,14 @@ public class CalendarFragment extends Fragment {
         //setting animation for x-axis, the bar will pop up separately within the time we set
         barChart.animateX(500);
 
-        List<Double> group1 = new ArrayList<>();
-        List<Double> group2 = new ArrayList<>();
+        List<Double> group1 = new ArrayList<>(); // baseline values
+        List<Double> group2 = new ArrayList<>(); // test values for the date
 
         // need this to account for the initial "empty" label for formatting purposes
-        group1.add(0.0);
-        group2.add(0.0);
+        group1.add(0, 0.0);
+        group2.add(0, 0.0);
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 4; i++)
         {
             group1.add(rand.nextDouble() + 4);
             group2.add(rand.nextDouble() + 5);
@@ -203,18 +203,6 @@ public class CalendarFragment extends Fragment {
         xAxis.setValueFormatter(xAxisFormatter);
         xAxis.setAxisMaximum(labels.length - 1.1f);
 
-
-//        //change the position of x-axis to the bottom
-//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-//        //set the horizontal distance of the grid line
-//        xAxis.setGranularity(1f);
-//        //hiding the x-axis line, default true if not set
-//        xAxis.setDrawAxisLine(false);
-//        //hiding the vertical grid lines, default true if not set
-//        xAxis.setDrawGridLines(false);
-
-
-
         YAxis leftAxis = barChart.getAxisLeft();
         //hiding the left y-axis line, default true if not set
         leftAxis.setDrawAxisLine(false);
@@ -235,7 +223,6 @@ public class CalendarFragment extends Fragment {
         legend.setOrientation(Legend.LegendOrientation.VERTICAL);
         //setting the location of legend outside the chart, default false if not set
         legend.setDrawInside(false);
-
     }
 
     private void getTestResultsForDay(int year, int month, int dayOfMonth) {
