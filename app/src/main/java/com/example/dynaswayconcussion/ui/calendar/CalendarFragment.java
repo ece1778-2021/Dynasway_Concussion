@@ -60,30 +60,15 @@ public class CalendarFragment extends Fragment {
 
     Random rand = new Random();
 
-    double staticRegularResult = 0.0;
-    double staticTandemResult = 0.0;
-    double staticRegularCognitiveResult = 0.0;
-    double staticTandemCognitiveResult = 0.0;
+    double[] baselineStatic = new double[5];
+    double[] resultsStatic = new double[5];
+    double[] baselineDynamic = new double[5];
+    double[] resultsDynamic = new double[5];
 
-    double dynamicRegularResult = 0.0;
-    double dynamicTandemResult = 0.0;
-    double dynamicRegularCognitiveResult = 0.0;
-    double dynamicTandemCognitiveResult = 0.0;
-
-    double staticBaselineRegular = 0.0;
-    double staticBaselineTandem = 0.0;
-    double staticBaselineRegularCognitive = 0.0;
-    double staticBaselineTandemCognitive = 0.0;
-
-    double dynamicBaselineRegular = 0.0;
-    double dynamicBaselineTandem = 0.0;
-    double dynamicBaselineRegularCognitive = 0.0;
-    double dynamicBaselineTandemCognitive = 0.0;
-
-    List<Double> baselineStatic = new ArrayList<>();
-    List<Double> resultsStatic = new ArrayList<>();
-    List<Double> baselineDynamic = new ArrayList<>();
-    List<Double> resultsDynamic = new ArrayList<>();
+    long[] baselineStaticTimestamps = new long[5];
+    long[] resultsStaticTimestamps = new long[5];
+    long[] baselineDynamicTimestamps = new long[5];
+    long[] resultsDynamicTimestamps = new long[5];
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -99,49 +84,43 @@ public class CalendarFragment extends Fragment {
         initBarChart(barChartStatic);
         initBarChart(barChartDynamic);
 
-        UpdateBarChart(barChartStatic);
-        UpdateBarChart(barChartDynamic);
-
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 getTestResultsForDay(year, month, dayOfMonth);
-
-                UpdateBarChart(barChartStatic);
-                UpdateBarChart(barChartDynamic);
             }
         });
 
         return view;
     }
 
-    private void UpdateBarChart(BarChart barChart)
+    private void UpdateBarChart(BarChart barChart, double[] baseline, double[] results)
     {
         //setting animation for y-axis, the bar will pop up from 0 to its value within the time we set
         barChart.animateY(500);
         //setting animation for x-axis, the bar will pop up separately within the time we set
         barChart.animateX(500);
 
-        List<Double> group1 = new ArrayList<>(); // baseline values
-        List<Double> group2 = new ArrayList<>(); // test values for the date
+        //List<Double> group1 = new ArrayList<>(); // baseline values
+        //List<Double> group2 = new ArrayList<>(); // test values for the date
 
         // need this to account for the initial "empty" label for formatting purposes
-        group1.add(0, 0.0);
+        /*group1.add(0, 0.0);
         group2.add(0, 0.0);
 
         for (int i = 0; i < 4; i++)
         {
             group1.add(rand.nextDouble() + 4);
             group2.add(rand.nextDouble() + 5);
-        }
+        }*/
 
         List<BarEntry> entriesGroup1 = new ArrayList<>();
         List<BarEntry> entriesGroup2 = new ArrayList<>();
 
         // fill the lists
-        for(int i = 0; i < group1.size(); i++) {
-            entriesGroup1.add(new BarEntry(i, group1.get(i).floatValue()));
-            entriesGroup2.add(new BarEntry(i, group2.get(i).floatValue()));
+        for(int i = 0; i < baseline.length; i++) {
+            entriesGroup1.add(new BarEntry(i, (float) baseline[i]));
+            entriesGroup2.add(new BarEntry(i, (float) results[i]));
         }
 
         BarDataSet set1 = new BarDataSet(entriesGroup1, "Baseline");
@@ -251,31 +230,77 @@ public class CalendarFragment extends Fragment {
                     Toast.LENGTH_SHORT).show();
         }
 
-        baselineStatic.clear();
-        baselineDynamic.clear();
-        resultsStatic.clear();
-        resultsDynamic.clear();
+        for (int i = 0; i < 5; i++) {
+            baselineStatic[i] = 0.0;
+            resultsStatic[i] = 0.0;
+            baselineDynamic[i] = 0.0;
+            resultsDynamic[i] = 0.0;
+            baselineStaticTimestamps[i] = -1;
+            resultsStaticTimestamps[i] = -1;
+            baselineDynamicTimestamps[i] = -1;
+            resultsDynamicTimestamps[i] = -1;
+        }
+
         CollectionReference testsRef = db.collection("test_results");
 
-        Query timeQuery = testsRef.whereGreaterThan("timestamp", startTimeMillis).whereLessThan("timestamp", endTimeMillis).whereEqualTo("user_uid", mAuth.getCurrentUser().getUid());
+        Query timeQuery = testsRef.whereGreaterThan("timestamp", startTimeMillis).whereLessThan("timestamp", endTimeMillis);
         timeQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @SuppressLint("NonConstantResourceId")
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                int count = 0;
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     Log.d("CALENDAR_INFO", document.getId() + " => " + document.getData());
                     double testResult = document.getDouble("value");
                     boolean isBaseline = document.getBoolean("is_baseline");
+                    boolean isFromUser = document.getString("user_uid").equals(mAuth.getCurrentUser().getUid());
                     String testType = document.getString("test_type");
+                    long timestamp = document.getLong("timestamp");
                     int testTypeID = getResId(testType, R.string.class);
-                    if (!isBaseline) {
-                        boolean correct = setResultValue(testResult, testTypeID);
+                    if (!isBaseline && isFromUser) {
+                        boolean correct = setResultValue(testResult, timestamp, testTypeID);
                         if (!correct) {
                             Toast.makeText(getActivity(), "Error loading part of the data for the day (Errno: 3).",
                                     Toast.LENGTH_SHORT).show();
                         }
+                        else {
+                            count++;
+                        }
                     }
-                    //TODO: call update graphs method with information
+                }
+                if (count > 0) {
+                    testsRef.whereEqualTo("is_baseline", true).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                Log.d("CALENDAR_INFO", document.getId() + " => " + document.getData());
+                                double testResult = document.getDouble("value");
+                                boolean isBaseline = document.getBoolean("is_baseline");
+                                boolean isFromUser = document.getString("user_uid").equals(mAuth.getCurrentUser().getUid());
+                                String testType = document.getString("test_type");
+                                long timestamp = document.getLong("timestamp");
+                                int testTypeID = getResId(testType, R.string.class);
+                                if (isBaseline && isFromUser) {
+                                    boolean correct = setBaselineValue(testResult, timestamp, testTypeID);
+                                    if (!correct) {
+                                        Toast.makeText(getActivity(), "Error loading part of the data for the day (Errno: 5).",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }
+                            UpdateBarChart(barChartStatic, baselineStatic, resultsStatic);
+                            UpdateBarChart(barChartDynamic, baselineDynamic, resultsDynamic);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getActivity(), "Error loading data for the day (Errno: 4).",
+                                    Toast.LENGTH_SHORT).show();
+                            Log.i("CALENDAR_INFO", e.toString());
+                            UpdateBarChart(barChartStatic, baselineStatic, resultsStatic);
+                            UpdateBarChart(barChartDynamic, baselineDynamic, resultsDynamic);
+                        }
+                    });
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -283,33 +308,7 @@ public class CalendarFragment extends Fragment {
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(getActivity(), "Error loading data for the day (Errno: 2).",
                         Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        testsRef.whereEqualTo("is_baseline", true).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                    Log.d("CALENDAR_INFO", document.getId() + " => " + document.getData());
-                    double testResult = document.getDouble("value");
-                    boolean isBaseline = document.getBoolean("is_baseline");
-                    String testType = document.getString("test_type");
-                    int testTypeID = getResId(testType, R.string.class);
-                    if (isBaseline) {
-                        boolean correct = setBaselineValue(testResult, testTypeID);
-                        if (!correct) {
-                            Toast.makeText(getActivity(), "Error loading part of the data for the day (Errno: 5).",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    //TODO: call update graphs method with information
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getActivity(), "Error loading data for the day (Errno: 4).",
-                        Toast.LENGTH_SHORT).show();
+                Log.i("CALENDAR_INFO", e.toString());
             }
         });
     }
@@ -325,32 +324,56 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-    private boolean setResultValue(double value, int testTypeID) {
+    private boolean setResultValue(double value, long timestamp, int testTypeID) {
         boolean isTestTypeCorrect = true;
         switch (testTypeID) {
             case R.string.static_test_regular_constant:
-                staticRegularResult = value;
+                if (timestamp > resultsStaticTimestamps[1]) {
+                    resultsStatic[1] = value;
+                    resultsStaticTimestamps[1] = timestamp;
+                }
                 break;
             case R.string.static_test_tandem_constant:
-                staticTandemResult = value;
+                if (timestamp > resultsStaticTimestamps[2]) {
+                    resultsStatic[2] = value;
+                    resultsStaticTimestamps[2] = timestamp;
+                }
                 break;
             case R.string.static_test_regular_dual_task_constant:
-                staticRegularCognitiveResult = value;
+                if (timestamp > resultsStaticTimestamps[3]) {
+                    resultsStatic[3] = value;
+                    resultsStaticTimestamps[3] = timestamp;
+                }
                 break;
             case R.string.static_test_tandem_dual_task_constant:
-                staticTandemCognitiveResult = value;
+                if (timestamp > resultsStaticTimestamps[4]) {
+                    resultsStatic[4] = value;
+                    resultsStaticTimestamps[4] = timestamp;
+                }
                 break;
             case R.string.dynamic_test_regular_constant:
-                dynamicRegularResult = value;
+                if (timestamp > resultsDynamicTimestamps[1]) {
+                    resultsDynamic[1] = value;
+                    resultsDynamicTimestamps[1] = timestamp;
+                }
                 break;
             case R.string.dynamic_test_tandem_constant:
-                dynamicTandemResult = value;
+                if (timestamp > resultsDynamicTimestamps[2]) {
+                    resultsDynamic[2] = value;
+                    resultsDynamicTimestamps[2] = timestamp;
+                }
                 break;
             case R.string.dynamic_test_regular_dual_task_constant:
-                dynamicRegularCognitiveResult = value;
+                if (timestamp > resultsDynamicTimestamps[3]) {
+                    resultsDynamic[3] = value;
+                    resultsDynamicTimestamps[3] = timestamp;
+                }
                 break;
             case R.string.dynamic_test_tandem_dual_task_constant:
-                dynamicTandemCognitiveResult = value;
+                if (timestamp > resultsDynamicTimestamps[4]) {
+                    resultsDynamic[4] = value;
+                    resultsDynamicTimestamps[4] = timestamp;
+                }
                 break;
             default:
                 isTestTypeCorrect = false;
@@ -359,32 +382,56 @@ public class CalendarFragment extends Fragment {
         return isTestTypeCorrect;
     }
 
-    private boolean setBaselineValue(double value, int testTypeID) {
+    private boolean setBaselineValue(double value, long timestamp, int testTypeID) {
         boolean isTestTypeCorrect = true;
         switch (testTypeID) {
             case R.string.static_test_regular_constant:
-                staticBaselineRegular = value;
+                if (timestamp > baselineStaticTimestamps[1]) {
+                    baselineStatic[1] = value;
+                    baselineStaticTimestamps[1] = timestamp;
+                }
                 break;
             case R.string.static_test_tandem_constant:
-                staticBaselineTandem = value;
+                if (timestamp > baselineStaticTimestamps[2]) {
+                    baselineStatic[2] = value;
+                    baselineStaticTimestamps[2] = timestamp;
+                }
                 break;
             case R.string.static_test_regular_dual_task_constant:
-                staticBaselineRegularCognitive = value;
+                if (timestamp > baselineStaticTimestamps[3]) {
+                    baselineStatic[3] = value;
+                    baselineStaticTimestamps[3] = timestamp;
+                }
                 break;
             case R.string.static_test_tandem_dual_task_constant:
-                staticBaselineTandemCognitive = value;
+                if (timestamp > baselineStaticTimestamps[4]) {
+                    baselineStatic[4] = value;
+                    baselineStaticTimestamps[4] = timestamp;
+                }
                 break;
             case R.string.dynamic_test_regular_constant:
-                dynamicBaselineRegular = value;
+                if (timestamp > baselineDynamicTimestamps[1]) {
+                    baselineDynamic[1] = value;
+                    baselineDynamicTimestamps[1] = timestamp;
+                }
                 break;
             case R.string.dynamic_test_tandem_constant:
-                dynamicBaselineTandem = value;
+                if (timestamp > baselineDynamicTimestamps[2]) {
+                    baselineDynamic[2] = value;
+                    baselineDynamicTimestamps[2] = timestamp;
+                }
                 break;
             case R.string.dynamic_test_regular_dual_task_constant:
-                dynamicBaselineRegularCognitive = value;
+                if (timestamp > baselineDynamicTimestamps[3]) {
+                    baselineDynamic[3] = value;
+                    baselineDynamicTimestamps[3] = timestamp;
+                }
                 break;
             case R.string.dynamic_test_tandem_dual_task_constant:
-                dynamicBaselineTandemCognitive = value;
+                if (timestamp > baselineDynamicTimestamps[4]) {
+                    baselineDynamic[4] = value;
+                    baselineDynamicTimestamps[4] = timestamp;
+                }
                 break;
             default:
                 isTestTypeCorrect = false;
