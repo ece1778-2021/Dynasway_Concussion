@@ -76,7 +76,9 @@ public class MainActivity extends AppCompatActivity {
             //requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_PERMISSION_CODE);
             requestedPermissions.add(Manifest.permission.RECORD_AUDIO);
         }
-        requestPermissions((String[]) requestedPermissions.toArray(), AUDIO_PERMISSION_CODE);
+        if (requestedPermissions.size() > 0) {
+            requestPermissions(requestedPermissions.toArray(new String[0]), AUDIO_PERMISSION_CODE);
+        }
     }
 
     @Override

@@ -468,7 +468,8 @@ public class CameraActivity extends AppCompatActivity {
         data.put("test_type", test_type);
         data.put("timestamp", timestamp);
         data.put("user_uid", mAuth.getUid());
-        data.put("value", -1);
+        double result = -1.0;
+        data.put("value", result);
         db.collection("test_results").add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
             @Override
             public void onComplete(@NonNull Task<DocumentReference> task) {
@@ -497,7 +498,7 @@ public class CameraActivity extends AppCompatActivity {
 
         File sourceFile = new File(sourceFileUri);
         if (!sourceFile.isFile()) {
-            Log.e("Huzza", "Source File Does not exist");
+            Log.e("CAMERA_INFO", "Source File Does not exist");
             return 0;
         }
         try { // open a URL connection to the Servlet

@@ -1,15 +1,20 @@
 package com.example.dynaswayconcussion.ui.calendar;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.dynaswayconcussion.R;
+import com.example.dynaswayconcussion.Tests.DynamicTest.camera.CameraActivity;
+import com.example.dynaswayconcussion.Utils.DateUtils;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -21,21 +26,67 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
 public class CalendarFragment extends Fragment {
+
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     BarChart barChartStatic;
     BarChart barChartDynamic;
 
     Random rand = new Random();
 
+    double staticRegularResult = 0.0;
+    double staticTandemResult = 0.0;
+    double staticRegularCognitiveResult = 0.0;
+    double staticTandemCognitiveResult = 0.0;
+
+    double dynamicRegularResult = 0.0;
+    double dynamicTandemResult = 0.0;
+    double dynamicRegularCognitiveResult = 0.0;
+    double dynamicTandemCognitiveResult = 0.0;
+
+    double staticBaselineRegular = 0.0;
+    double staticBaselineTandem = 0.0;
+    double staticBaselineRegularCognitive = 0.0;
+    double staticBaselineTandemCognitive = 0.0;
+
+    double dynamicBaselineRegular = 0.0;
+    double dynamicBaselineTandem = 0.0;
+    double dynamicBaselineRegularCognitive = 0.0;
+    double dynamicBaselineTandemCognitive = 0.0;
+
+    List<Double> baselineStatic = new ArrayList<>();
+    List<Double> resultsStatic = new ArrayList<>();
+    List<Double> baselineDynamic = new ArrayList<>();
+    List<Double> resultsDynamic = new ArrayList<>();
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
+
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         CalendarView calendarView = view.findViewById(R.id.calendarView);
         barChartStatic = view.findViewById(R.id.barChartStatic);
@@ -50,6 +101,8 @@ public class CalendarFragment extends Fragment {
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                getTestResultsForDay(year, month, dayOfMonth);
+
                 UpdateBarChart(barChartStatic);
                 UpdateBarChart(barChartDynamic);
             }
@@ -154,5 +207,173 @@ public class CalendarFragment extends Fragment {
         //setting the location of legend outside the chart, default false if not set
         legend.setDrawInside(false);
 
+    }
+
+    private void getTestResultsForDay(int year, int month, int dayOfMonth) {
+        String dateFormatted = year + "-";
+        if (month < 10) {
+            dateFormatted += "0" + month + "-";
+        }
+        else {
+            dateFormatted += month + "-";
+        }
+
+        if (dayOfMonth < 10) {
+            dateFormatted += "0" + dayOfMonth;
+        }
+        else {
+            dateFormatted += dayOfMonth;
+        }
+        long startTimeMillis = -1;
+        long endTimeMillis = -1;
+        try {
+            startTimeMillis = DateUtils.getStartOfDayInMillis(dateFormatted);
+            endTimeMillis = DateUtils.getEndOfDayInMillis(dateFormatted);
+        }
+        catch (ParseException pe) {
+            Toast.makeText(getActivity(), "Error loading data for the day (Errno: 1).",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        baselineStatic.clear();
+        baselineDynamic.clear();
+        resultsStatic.clear();
+        resultsDynamic.clear();
+        CollectionReference testsRef = db.collection("test_results");
+
+        Query timeQuery = testsRef.whereGreaterThan("timestamp", startTimeMillis).whereLessThan("timestamp", endTimeMillis).whereEqualTo("user_uid", mAuth.getCurrentUser().getUid());
+        timeQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @SuppressLint("NonConstantResourceId")
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    Log.d("CALENDAR_INFO", document.getId() + " => " + document.getData());
+                    double testResult = document.getDouble("value");
+                    boolean isBaseline = document.getBoolean("is_baseline");
+                    String testType = document.getString("test_type");
+                    int testTypeID = getResId(testType, R.string.class);
+                    if (!isBaseline) {
+                        boolean correct = setResultValue(testResult, testTypeID);
+                        if (!correct) {
+                            Toast.makeText(getActivity(), "Error loading part of the data for the day (Errno: 3).",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    //TODO: call update graphs method with information
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getActivity(), "Error loading data for the day (Errno: 2).",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        testsRef.whereEqualTo("is_baseline", true).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    Log.d("CALENDAR_INFO", document.getId() + " => " + document.getData());
+                    double testResult = document.getDouble("value");
+                    boolean isBaseline = document.getBoolean("is_baseline");
+                    String testType = document.getString("test_type");
+                    int testTypeID = getResId(testType, R.string.class);
+                    if (isBaseline) {
+                        boolean correct = setBaselineValue(testResult, testTypeID);
+                        if (!correct) {
+                            Toast.makeText(getActivity(), "Error loading part of the data for the day (Errno: 5).",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    //TODO: call update graphs method with information
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getActivity(), "Error loading data for the day (Errno: 4).",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static int getResId(String resName, Class<?> c) {
+
+        try {
+            Field idField = c.getDeclaredField(resName);
+            return idField.getInt(idField);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    private boolean setResultValue(double value, int testTypeID) {
+        boolean isTestTypeCorrect = true;
+        switch (testTypeID) {
+            case R.string.static_test_regular_constant:
+                staticRegularResult = value;
+                break;
+            case R.string.static_test_tandem_constant:
+                staticTandemResult = value;
+                break;
+            case R.string.static_test_regular_dual_task_constant:
+                staticRegularCognitiveResult = value;
+                break;
+            case R.string.static_test_tandem_dual_task_constant:
+                staticTandemCognitiveResult = value;
+                break;
+            case R.string.dynamic_test_regular_constant:
+                dynamicRegularResult = value;
+                break;
+            case R.string.dynamic_test_tandem_constant:
+                dynamicTandemResult = value;
+                break;
+            case R.string.dynamic_test_regular_dual_task_constant:
+                dynamicRegularCognitiveResult = value;
+                break;
+            case R.string.dynamic_test_tandem_dual_task_constant:
+                dynamicTandemCognitiveResult = value;
+                break;
+            default:
+                isTestTypeCorrect = false;
+                break;
+        }
+        return isTestTypeCorrect;
+    }
+
+    private boolean setBaselineValue(double value, int testTypeID) {
+        boolean isTestTypeCorrect = true;
+        switch (testTypeID) {
+            case R.string.static_test_regular_constant:
+                staticBaselineRegular = value;
+                break;
+            case R.string.static_test_tandem_constant:
+                staticBaselineTandem = value;
+                break;
+            case R.string.static_test_regular_dual_task_constant:
+                staticBaselineRegularCognitive = value;
+                break;
+            case R.string.static_test_tandem_dual_task_constant:
+                staticBaselineTandemCognitive = value;
+                break;
+            case R.string.dynamic_test_regular_constant:
+                dynamicBaselineRegular = value;
+                break;
+            case R.string.dynamic_test_tandem_constant:
+                dynamicBaselineTandem = value;
+                break;
+            case R.string.dynamic_test_regular_dual_task_constant:
+                dynamicBaselineRegularCognitive = value;
+                break;
+            case R.string.dynamic_test_tandem_dual_task_constant:
+                dynamicBaselineTandemCognitive = value;
+                break;
+            default:
+                isTestTypeCorrect = false;
+                break;
+        }
+        return isTestTypeCorrect;
     }
 }

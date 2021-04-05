@@ -1,7 +1,9 @@
 package com.example.dynaswayconcussion.ui.tests;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.icu.text.UnicodeSetSpanner;
 import android.media.AudioManager;
@@ -15,11 +17,19 @@ import android.widget.Toast;
 
 import com.example.dynaswayconcussion.R;
 import com.example.dynaswayconcussion.Tests.DynamicTest.DynamicTest;
+import com.example.dynaswayconcussion.Tests.DynamicTest.camera.CameraActivity;
 import com.example.dynaswayconcussion.Tests.ITest;
 import com.example.dynaswayconcussion.Tests.StaticTest.StaticTest;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestActivity extends AppCompatActivity {
 
@@ -44,6 +54,7 @@ public class TestActivity extends AppCompatActivity {
 
     ITest test;
     boolean isBaseline = false;
+    String test_type = "ERROR";
 
     DecimalFormat decimalFormat = new DecimalFormat("00");
 
@@ -105,9 +116,8 @@ public class TestActivity extends AppCompatActivity {
             seconds = seconds % 60;
             long millis = timeRemaining % 1000;
 
-            String timeString = MessageFormat.format("{0}s {1}",
-                    decimalFormat.format(seconds),
-                    decimalFormat.format(millis));
+            String timeString = MessageFormat.format("{0}s"/*"{0}s {1}"*/,
+                    decimalFormat.format(seconds)/*, decimalFormat.format(millis)*/);
 
             txtTestTimer.setText(timeString);
             timerHandler.postDelayed(this, 10);
@@ -127,6 +137,7 @@ public class TestActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         int testType = intent.getIntExtra("test_type", 0);
+        test_type = getString(testType);
         isBaseline = intent.getBooleanExtra("is_baseline", false);
 
         switch (testType)
@@ -158,7 +169,8 @@ public class TestActivity extends AppCompatActivity {
     {
         test.stopTest();
         double result = test.getResult();
-        Toast.makeText(this, String.valueOf(result), Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, String.valueOf(result), Toast.LENGTH_LONG).show();
+        uploadResult(result);
         timerHandler.removeCallbacks(timerRunnable);
     }
 
@@ -175,5 +187,24 @@ public class TestActivity extends AppCompatActivity {
         Intent data = new Intent();
         setResult(RESULT_OK, data);
         finish();
+    }
+
+    public void uploadResult(double result) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Map<String, Object> data = new HashMap<>();
+        data.put("is_baseline", isBaseline);
+        data.put("test_type", test_type);
+        data.put("timestamp", System.currentTimeMillis());
+        data.put("user_uid", mAuth.getUid());
+        data.put("value", -1);
+        Context toastContext = this;
+        db.collection("test_results").add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+                Toast.makeText(toastContext, "Test completed, result saved!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
     }
 }
