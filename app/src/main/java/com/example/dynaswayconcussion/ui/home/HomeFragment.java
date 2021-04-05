@@ -10,13 +10,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.dynaswayconcussion.R;
 import com.example.dynaswayconcussion.ui.CircularImageView;
+import com.example.dynaswayconcussion.ui.tests.StaticTestSelectionFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,10 +32,14 @@ public class HomeFragment extends Fragment {
     private FirebaseStorage storage;
 
     //Component related variables
-    Button about_concussions;
-    Button treatment_options;
-    Button get_involved;
-    Button concussion_stats;
+    Button btnAboutConcussions;
+    Button btnTreatmentOptions;
+    Button btnGetInvolved;
+    Button btnConcussionStats;
+    Button btnProfileCode;
+    Button btnConnectCoach;
+    Button btnLogConcussion;
+    Button btnAboutApp;
 
     TextView hello_textview;
 
@@ -51,14 +54,20 @@ public class HomeFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
 
-        about_concussions = (Button)view.findViewById(R.id.home_about_concussions_button);
-        treatment_options = (Button)view.findViewById(R.id.home_treatment_options_button);
-        get_involved = (Button)view.findViewById(R.id.home_get_involved_button);
-        concussion_stats = (Button)view.findViewById(R.id.home_concussion_stats_button);
+        btnAboutConcussions = (Button)view.findViewById(R.id.home_about_concussions_button);
+        btnTreatmentOptions = (Button)view.findViewById(R.id.home_treatment_options_button);
+        btnGetInvolved = (Button)view.findViewById(R.id.home_get_involved_button);
+        btnConcussionStats = (Button)view.findViewById(R.id.home_concussion_stats_button);
+
+        btnProfileCode = (Button) view.findViewById(R.id.home_profile_code);
+        btnConnectCoach = (Button) view.findViewById(R.id.home_connect_coach);
+        btnLogConcussion = (Button) view.findViewById(R.id.home_log_inujry);
+        btnAboutApp = (Button) view.findViewById(R.id.home_about_the_app);
+
         hello_textview = (TextView)view.findViewById(R.id.home_hello_textview);
         profile_imageview = (CircularImageView)view.findViewById(R.id.home_profile_imageview);
 
-        about_concussions.setOnClickListener(new View.OnClickListener() {
+        btnAboutConcussions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri uri = Uri.parse("http://concussionsontario.org/patienteducation/aboutconcussions-2/");
@@ -66,7 +75,7 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        treatment_options.setOnClickListener(new View.OnClickListener() {
+        btnTreatmentOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri uri = Uri.parse("https://concussionfoundation.org/concussion-resources/treatments");
@@ -74,7 +83,7 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        get_involved.setOnClickListener(new View.OnClickListener() {
+        btnGetInvolved.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri uri = Uri.parse("https://www.concussionfoundation.ca/programs-projects/programs");
@@ -82,7 +91,7 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        concussion_stats.setOnClickListener(new View.OnClickListener() {
+        btnConcussionStats.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri uri = Uri.parse("http://concussionsontario.org/access-to-care/concussion-data/");
@@ -90,6 +99,38 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        btnProfileCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TeamsConnectionFragment frag = TeamsConnectionFragment.newInstance(mAuth.getCurrentUser().getUid());
+                FragmentTransaction fr = getFragmentManager().beginTransaction();
+                fr.replace(R.id.nav_host_fragment, frag).addToBackStack( "backstack");
+                fr.commit();
+            }
+        });
+
+        btnConnectCoach.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        btnLogConcussion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        btnAboutApp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         loadProfileInfo();
         return view;
     }
