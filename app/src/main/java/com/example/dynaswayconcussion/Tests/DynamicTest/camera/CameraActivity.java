@@ -557,7 +557,7 @@ public class CameraActivity extends AppCompatActivity {
             e.printStackTrace();
             return -1;
         }
-//this block will give the response of upload link
+        //this block will give the response of upload link
         try {
             BufferedReader rd = new BufferedReader(new InputStreamReader(conn
                     .getInputStream()));
@@ -635,7 +635,6 @@ public class CameraActivity extends AppCompatActivity {
                                 Log.i("CAMERA_INFO", "Loaded video from gallery");
                             }
                         }
-
                     }
                     break;
                 default:

@@ -1,7 +1,9 @@
 package com.example.dynaswayconcussion.ui.calendar;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.renderscript.Sampler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import com.example.dynaswayconcussion.R;
 import com.example.dynaswayconcussion.Tests.DynamicTest.camera.CameraActivity;
 import com.example.dynaswayconcussion.Utils.DateUtils;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
@@ -30,6 +33,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.slider.LabelFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -121,7 +125,11 @@ public class CalendarFragment extends Fragment {
         List<Double> group1 = new ArrayList<>();
         List<Double> group2 = new ArrayList<>();
 
-        for (int i = 0; i < 4; i++)
+        // need this to account for the initial "empty" label for formatting purposes
+        group1.add(0.0);
+        group2.add(0.0);
+
+        for (int i = 0; i < 5; i++)
         {
             group1.add(rand.nextDouble() + 4);
             group2.add(rand.nextDouble() + 5);
@@ -142,7 +150,7 @@ public class CalendarFragment extends Fragment {
         set1.setColor(getContext().getColor(R.color.chart_baseline));
         set2.setColor(getContext().getColor(R.color.chart_test));
 
-        float groupSpace = 0.06f;
+        float groupSpace = 0.26f;
         float barSpace = 0.02f; // x2 dataset
         float barWidth = 0.35f; // x2 dataset
         // (0.02 + 0.45) * 2 + 0.06 = 1.00 -> interval per "group"
@@ -159,6 +167,9 @@ public class CalendarFragment extends Fragment {
     }
 
     private void initBarChart(BarChart barChart){
+        barChart.setPinchZoom(false);
+        barChart.getDescription().setEnabled(false);
+
         //hiding the grey background of the chart, default false if not set
         barChart.setDrawGridBackground(false);
         //remove the bar shadow, default false if not set
@@ -176,15 +187,33 @@ public class CalendarFragment extends Fragment {
 //        //setting animation for x-axis, the bar will pop up separately within the time we set
 //        barChart.animateX(1000);
 
+        String[] labels = {"", "Regular", "Tandem", "Regular Dual", "Tandem Dual", ""};
+        ValueFormatter xAxisFormatter = new LabelFormatter(barChart, labels);
+
         XAxis xAxis = barChart.getXAxis();
-        //change the position of x-axis to the bottom
+
+        xAxis.setCenterAxisLabels(true);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        //set the horizontal distance of the grid line
-        xAxis.setGranularity(1f);
-        //hiding the x-axis line, default true if not set
-        xAxis.setDrawAxisLine(false);
-        //hiding the vertical grid lines, default true if not set
         xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f); // only intervals of 1 day
+        xAxis.setTextColor(Color.BLACK);
+        xAxis.setTextSize(8);
+        xAxis.setAxisLineColor(Color.WHITE);
+        xAxis.setAxisMinimum(1f);
+        xAxis.setValueFormatter(xAxisFormatter);
+        xAxis.setAxisMaximum(labels.length - 1.1f);
+
+
+//        //change the position of x-axis to the bottom
+//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+//        //set the horizontal distance of the grid line
+//        xAxis.setGranularity(1f);
+//        //hiding the x-axis line, default true if not set
+//        xAxis.setDrawAxisLine(false);
+//        //hiding the vertical grid lines, default true if not set
+//        xAxis.setDrawGridLines(false);
+
+
 
         YAxis leftAxis = barChart.getAxisLeft();
         //hiding the left y-axis line, default true if not set
@@ -200,10 +229,10 @@ public class CalendarFragment extends Fragment {
         //setting the text size of the legend
         legend.setTextSize(11f);
         //setting the alignment of legend toward the chart
-        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         //setting the stacking direction of legend
-        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setOrientation(Legend.LegendOrientation.VERTICAL);
         //setting the location of legend outside the chart, default false if not set
         legend.setDrawInside(false);
 
@@ -375,5 +404,21 @@ public class CalendarFragment extends Fragment {
                 break;
         }
         return isTestTypeCorrect;
+    }
+
+    private class LabelFormatter extends ValueFormatter {
+
+        String[] labels;
+        BarLineChartBase<?> chart;
+
+        LabelFormatter(BarLineChartBase<?> chart, String[] labels) {
+            this.chart = chart;
+            this.labels = labels;
+        }
+
+        @Override
+        public String getFormattedValue(float value) {
+            return labels[(int) value];
+        }
     }
 }

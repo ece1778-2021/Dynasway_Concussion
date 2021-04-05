@@ -21,7 +21,7 @@
         android:theme="@style/Theme.DynaswayConcussion"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Tests.DynamicTest.camera.CameraActivity"></activity>
+        <activity android:name=".Tests.DynamicTest.camera.CameraActivity"/>
         <activity android:name=".ui.tests.TestActivity" />
         <activity android:name=".ui.tests.TestInstructionsActivity" />
         <activity android:name=".RegisterActivity" />

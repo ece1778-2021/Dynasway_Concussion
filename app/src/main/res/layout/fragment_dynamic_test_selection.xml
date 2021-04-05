@@ -7,6 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".ui.tests.DynamicTestSelectionFragment">
 
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="180dp"
+        android:src="@drawable/purple_swirl"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline4"
         android:layout_width="wrap_content"
@@ -28,11 +38,11 @@
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
         app:cardBackgroundColor="@color/main_green"
-        app:layout_constraintBottom_toTopOf="@+id/guideline4"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.85">
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.20">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -64,11 +74,11 @@
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
         app:cardBackgroundColor="@color/main_green"
-        app:layout_constraintBottom_toTopOf="@+id/guideline4"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.85">
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.20">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -103,8 +113,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guideline4"
-        app:layout_constraintVertical_bias="0.15">
+        app:layout_constraintTop_toBottomOf="@+id/cardViewDynamicTestRegular"
+        app:layout_constraintVertical_bias="0.25">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -140,8 +150,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toTopOf="@+id/guideline4"
-        app:layout_constraintVertical_bias="0.15">
+        app:layout_constraintTop_toBottomOf="@+id/cardViewDynamicTestTandem"
+        app:layout_constraintVertical_bias="0.25">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -173,7 +183,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="Dynamic Tests"
-        android:textColor="@color/main_pink"
+        android:textStyle="bold"
+        android:textColor="#239950"
         android:textSize="32sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
