@@ -30,13 +30,16 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -53,13 +56,21 @@ public class CoachHomeFragment extends Fragment {
 
     LinearLayout connectionsLayout;
     List<String> athleteUidList = new ArrayList<>();
+    List<String> athleteNameDict = new ArrayList<>();
+
+    Hashtable<String, String> athleteNameMap = new Hashtable<String, String>();
+
+    CollectionReference connectionsRef;
 
     public CoachHomeFragment() {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        athleteUidList.add("GT8ODAet7scHJpt9yNCvetnuqTr1");
-        athleteUidList.add("CDevveNn3FMpNcTaRivb2J4AWa62");
-        athleteUidList.add("6uQDOxsPc4Yb1G5LKLI2EoTZ8Lo1");
+
+        connectionsRef = db.collection("connections");
+//
+//        athleteUidList.add("GT8ODAet7scHJpt9yNCvetnuqTr1");
+//        athleteUidList.add("CDevveNn3FMpNcTaRivb2J4AWa62");
+//        athleteUidList.add("6uQDOxsPc4Yb1G5LKLI2EoTZ8Lo1");
     }
 
     @Override
@@ -71,6 +82,19 @@ public class CoachHomeFragment extends Fragment {
         hello_textview = (TextView) view.findViewById(R.id.home_hello_textview);
         profile_imageview = (CircularImageView) view.findViewById(R.id.home_profile_imageview);
         connectionsLayout = (LinearLayout) view.findViewById(R.id.linearLayoutAthleteList);
+
+        Query connectionsQuery = connectionsRef.whereEqualTo("user_uid1", mAuth.getCurrentUser().getUid());
+        connectionsQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots)
+                {
+                    if (!athleteUidList.contains(queryDocumentSnapshot.getString("user_uid2")))
+                        athleteUidList.add(queryDocumentSnapshot.getString("user_uid2"));
+                }
+                searchNames();
+            }
+        });
 
         scanCodeButton = view.findViewById(R.id.coach_connect_button);
         scanCodeButton.setOnClickListener(new View.OnClickListener() {
@@ -95,9 +119,51 @@ public class CoachHomeFragment extends Fragment {
         });
 
         loadProfileInfo();
-        addButtons();
+        // addButtons();
 
         return view;
+    }
+
+    private void searchNames()
+    {
+        for (String uid : athleteUidList)
+        {
+            if (!athleteNameMap.containsKey(uid))
+            {
+                DocumentReference ref = db.collection("users").document(uid);
+                ref.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document != null) {
+                                String firstName = document.getString("first_name");
+                                String lastName = document.getString("last_name");
+                                String fullName = firstName + " " + lastName;
+                                athleteNameMap.put(uid, fullName);
+                                addButton(fullName, uid);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private void addButton(String name, String uid)
+    {
+        Button btn = new Button(getContext());
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(4, 8, 4, 8);
+        btn.setLayoutParams(params);
+
+        btn.setBackgroundTintList(this.getResources().getColorStateList(R.color.main_green));
+        btn.setOnClickListener(btnAthleteClick);
+        btn.setTag(uid);
+
+        btn.setText(name);
+        connectionsLayout.addView(btn);
     }
 
     private void addButtons()
@@ -126,11 +192,8 @@ public class CoachHomeFragment extends Fragment {
     View.OnClickListener btnAthleteClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Toast.makeText(getContext(),
-                    String.valueOf(v.getId()),
-                    Toast.LENGTH_SHORT).show();
 
-            CalendarFragment frag = CalendarFragment.newInstance(athleteUidList.get((int)v.getId()));
+            CalendarFragment frag = CalendarFragment.newInstance((String) v.getTag());
             getActivity().getSupportFragmentManager().beginTransaction().replace(android.R.id.content, frag, "tag")
                     .addToBackStack("backstack")
                     .commit();
