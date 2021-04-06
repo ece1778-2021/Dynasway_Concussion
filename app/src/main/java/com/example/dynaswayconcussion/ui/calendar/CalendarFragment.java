@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.renderscript.Sampler;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -87,10 +89,15 @@ public class CalendarFragment extends Fragment {
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                getTestResultsForDay(year, month, dayOfMonth);
+                getTestResultsForDay(year, month + 1, dayOfMonth);
             }
         });
 
+        Date currentTime = Calendar.getInstance().getTime();
+        String day = (String) DateFormat.format("dd",   currentTime); // 20
+        String monthNumber = (String) DateFormat.format("MM",   currentTime); // 06
+        String year = (String) DateFormat.format("yyyy", currentTime); // 2013
+        getTestResultsForDay(Integer.parseInt(year), Integer.parseInt(monthNumber), Integer.parseInt(day));
         return view;
     }
 
@@ -118,7 +125,7 @@ public class CalendarFragment extends Fragment {
         List<BarEntry> entriesGroup2 = new ArrayList<>();
 
         // fill the lists
-        for(int i = 0; i < baseline.length; i++) {
+        for(int i = 0; i < 5; i++) {
             entriesGroup1.add(new BarEntry(i, (float) baseline[i]));
             entriesGroup2.add(new BarEntry(i, (float) results[i]));
         }
@@ -205,6 +212,10 @@ public class CalendarFragment extends Fragment {
     }
 
     private void getTestResultsForDay(int year, int month, int dayOfMonth) {
+        Log.i("CALENDAR_INFO", "Inputted year: " + year);
+        Log.i("CALENDAR_INFO", "Inputted month: " + month);
+        Log.i("CALENDAR_INFO", "Inputted day: " + dayOfMonth);
+
         String dateFormatted = year + "-";
         if (month < 10) {
             dateFormatted += "0" + month + "-";
@@ -259,9 +270,9 @@ public class CalendarFragment extends Fragment {
                     boolean isFromUser = document.getString("user_uid").equals(mAuth.getCurrentUser().getUid());
                     String testType = document.getString("test_type");
                     long timestamp = document.getLong("timestamp");
-                    int testTypeID = getResId(testType, R.string.class);
+                    Log.i("CALENDAR_INFO", "Test string type: " + testType);
                     if (!isBaseline && isFromUser) {
-                        boolean correct = setResultValue(testResult, timestamp, testTypeID);
+                        boolean correct = setResultValue(testResult, timestamp, testType);
                         if (!correct) {
                             Toast.makeText(getActivity(), "Error loading part of the data for the day (Errno: 3).",
                                     Toast.LENGTH_SHORT).show();
@@ -282,9 +293,8 @@ public class CalendarFragment extends Fragment {
                                 boolean isFromUser = document.getString("user_uid").equals(mAuth.getCurrentUser().getUid());
                                 String testType = document.getString("test_type");
                                 long timestamp = document.getLong("timestamp");
-                                int testTypeID = getResId(testType, R.string.class);
                                 if (isBaseline && isFromUser) {
-                                    boolean correct = setBaselineValue(testResult, timestamp, testTypeID);
+                                    boolean correct = setBaselineValue(testResult, timestamp, testType);
                                     if (!correct) {
                                         Toast.makeText(getActivity(), "Error loading part of the data for the day (Errno: 5).",
                                                 Toast.LENGTH_SHORT).show();
@@ -305,6 +315,14 @@ public class CalendarFragment extends Fragment {
                         }
                     });
                 }
+                else {
+                    //UpdateBarChart(barChartStatic, baselineStatic, resultsStatic);
+                    //UpdateBarChart(barChartDynamic, baselineDynamic, resultsDynamic);
+                    barChartStatic.invalidate();
+                    barChartStatic.clear();
+                    barChartDynamic.invalidate();
+                    barChartDynamic.clear();
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -316,129 +334,133 @@ public class CalendarFragment extends Fragment {
         });
     }
 
-    public static int getResId(String resName, Class<?> c) {
+    private boolean setResultValue(double value, long timestamp, String testTypeID) {
+        final String REGULAR_STANDING_STRING = getResources().getString(R.string.static_test_regular_constant);
+        final String TANDEM_STANDING_STRING = getResources().getString(R.string.static_test_tandem_constant);
+        final String REGULAR_STANDING_COGNITIVE_STRING = getResources().getString(R.string.static_test_regular_dual_task_constant);
+        final String TANDEM_STANDING_COGNITIVE_STRING = getResources().getString(R.string.static_test_tandem_dual_task_constant);
 
-        try {
-            Field idField = c.getDeclaredField(resName);
-            return idField.getInt(idField);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
+        final String REGULAR_DYNAMIC_STRING = getResources().getString(R.string.dynamic_test_regular_constant);
+        final String TANDEM_DYNAMIC_STRING = getResources().getString(R.string.dynamic_test_tandem_constant);
+        final String REGULAR_DYNAMIC_COGNITIVE_STRING = getResources().getString(R.string.dynamic_test_regular_dual_task_constant);
+        final String TANDEM_DYNAMIC_COGNITIVE_STRING = getResources().getString(R.string.dynamic_test_tandem_dual_task_constant);
 
-    private boolean setResultValue(double value, long timestamp, int testTypeID) {
         boolean isTestTypeCorrect = true;
-        switch (testTypeID) {
-            case R.string.static_test_regular_constant:
-                if (timestamp > resultsStaticTimestamps[1]) {
-                    resultsStatic[1] = value;
-                    resultsStaticTimestamps[1] = timestamp;
-                }
-                break;
-            case R.string.static_test_tandem_constant:
-                if (timestamp > resultsStaticTimestamps[2]) {
-                    resultsStatic[2] = value;
-                    resultsStaticTimestamps[2] = timestamp;
-                }
-                break;
-            case R.string.static_test_regular_dual_task_constant:
-                if (timestamp > resultsStaticTimestamps[3]) {
-                    resultsStatic[3] = value;
-                    resultsStaticTimestamps[3] = timestamp;
-                }
-                break;
-            case R.string.static_test_tandem_dual_task_constant:
-                if (timestamp > resultsStaticTimestamps[4]) {
-                    resultsStatic[4] = value;
-                    resultsStaticTimestamps[4] = timestamp;
-                }
-                break;
-            case R.string.dynamic_test_regular_constant:
-                if (timestamp > resultsDynamicTimestamps[1]) {
-                    resultsDynamic[1] = value;
-                    resultsDynamicTimestamps[1] = timestamp;
-                }
-                break;
-            case R.string.dynamic_test_tandem_constant:
-                if (timestamp > resultsDynamicTimestamps[2]) {
-                    resultsDynamic[2] = value;
-                    resultsDynamicTimestamps[2] = timestamp;
-                }
-                break;
-            case R.string.dynamic_test_regular_dual_task_constant:
-                if (timestamp > resultsDynamicTimestamps[3]) {
-                    resultsDynamic[3] = value;
-                    resultsDynamicTimestamps[3] = timestamp;
-                }
-                break;
-            case R.string.dynamic_test_tandem_dual_task_constant:
-                if (timestamp > resultsDynamicTimestamps[4]) {
-                    resultsDynamic[4] = value;
-                    resultsDynamicTimestamps[4] = timestamp;
-                }
-                break;
-            default:
-                isTestTypeCorrect = false;
-                break;
+        if (testTypeID.equals(REGULAR_STANDING_STRING)) {
+            if (timestamp > resultsStaticTimestamps[1]) {
+                resultsStatic[1] = value;
+                resultsStaticTimestamps[1] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(TANDEM_STANDING_STRING)) {
+            if (timestamp > resultsStaticTimestamps[2]) {
+                resultsStatic[2] = value;
+                resultsStaticTimestamps[2] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(REGULAR_STANDING_COGNITIVE_STRING)) {
+            if (timestamp > resultsStaticTimestamps[3]) {
+                resultsStatic[3] = value;
+                resultsStaticTimestamps[3] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(TANDEM_STANDING_COGNITIVE_STRING)) {
+            if (timestamp > resultsStaticTimestamps[4]) {
+                resultsStatic[4] = value;
+                resultsStaticTimestamps[4] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(REGULAR_DYNAMIC_STRING)) {
+            if (timestamp > resultsDynamicTimestamps[1]) {
+                resultsDynamic[1] = value;
+                resultsDynamicTimestamps[1] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(TANDEM_DYNAMIC_STRING)) {
+            if (timestamp > resultsDynamicTimestamps[2]) {
+                resultsDynamic[2] = value;
+                resultsDynamicTimestamps[2] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(REGULAR_DYNAMIC_COGNITIVE_STRING)) {
+            if (timestamp > resultsDynamicTimestamps[3]) {
+                resultsDynamic[3] = value;
+                resultsDynamicTimestamps[3] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(TANDEM_DYNAMIC_COGNITIVE_STRING)) {
+            if (timestamp > resultsDynamicTimestamps[4]) {
+                resultsDynamic[4] = value;
+                resultsDynamicTimestamps[4] = timestamp;
+            }
+        }
+        else {
+            isTestTypeCorrect = false;
         }
         return isTestTypeCorrect;
     }
 
-    private boolean setBaselineValue(double value, long timestamp, int testTypeID) {
+    private boolean setBaselineValue(double value, long timestamp, String testTypeID) {
+        final String REGULAR_STANDING_STRING = getResources().getString(R.string.static_test_regular_constant);
+        final String TANDEM_STANDING_STRING = getResources().getString(R.string.static_test_tandem_constant);
+        final String REGULAR_STANDING_COGNITIVE_STRING = getResources().getString(R.string.static_test_regular_dual_task_constant);
+        final String TANDEM_STANDING_COGNITIVE_STRING = getResources().getString(R.string.static_test_tandem_dual_task_constant);
+
+        final String REGULAR_DYNAMIC_STRING = getResources().getString(R.string.dynamic_test_regular_constant);
+        final String TANDEM_DYNAMIC_STRING = getResources().getString(R.string.dynamic_test_tandem_constant);
+        final String REGULAR_DYNAMIC_COGNITIVE_STRING = getResources().getString(R.string.dynamic_test_regular_dual_task_constant);
+        final String TANDEM_DYNAMIC_COGNITIVE_STRING = getResources().getString(R.string.dynamic_test_tandem_dual_task_constant);
         boolean isTestTypeCorrect = true;
-        switch (testTypeID) {
-            case R.string.static_test_regular_constant:
-                if (timestamp > baselineStaticTimestamps[1]) {
-                    baselineStatic[1] = value;
-                    baselineStaticTimestamps[1] = timestamp;
-                }
-                break;
-            case R.string.static_test_tandem_constant:
-                if (timestamp > baselineStaticTimestamps[2]) {
-                    baselineStatic[2] = value;
-                    baselineStaticTimestamps[2] = timestamp;
-                }
-                break;
-            case R.string.static_test_regular_dual_task_constant:
-                if (timestamp > baselineStaticTimestamps[3]) {
-                    baselineStatic[3] = value;
-                    baselineStaticTimestamps[3] = timestamp;
-                }
-                break;
-            case R.string.static_test_tandem_dual_task_constant:
-                if (timestamp > baselineStaticTimestamps[4]) {
-                    baselineStatic[4] = value;
-                    baselineStaticTimestamps[4] = timestamp;
-                }
-                break;
-            case R.string.dynamic_test_regular_constant:
-                if (timestamp > baselineDynamicTimestamps[1]) {
-                    baselineDynamic[1] = value;
-                    baselineDynamicTimestamps[1] = timestamp;
-                }
-                break;
-            case R.string.dynamic_test_tandem_constant:
-                if (timestamp > baselineDynamicTimestamps[2]) {
-                    baselineDynamic[2] = value;
-                    baselineDynamicTimestamps[2] = timestamp;
-                }
-                break;
-            case R.string.dynamic_test_regular_dual_task_constant:
-                if (timestamp > baselineDynamicTimestamps[3]) {
-                    baselineDynamic[3] = value;
-                    baselineDynamicTimestamps[3] = timestamp;
-                }
-                break;
-            case R.string.dynamic_test_tandem_dual_task_constant:
-                if (timestamp > baselineDynamicTimestamps[4]) {
-                    baselineDynamic[4] = value;
-                    baselineDynamicTimestamps[4] = timestamp;
-                }
-                break;
-            default:
-                isTestTypeCorrect = false;
-                break;
+        if (testTypeID.equals(REGULAR_STANDING_STRING)) {
+            if (timestamp > baselineStaticTimestamps[1]) {
+                baselineStatic[1] = value;
+                baselineStaticTimestamps[1] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(TANDEM_STANDING_STRING)) {
+            if (timestamp > baselineStaticTimestamps[2]) {
+                baselineStatic[2] = value;
+                baselineStaticTimestamps[2] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(REGULAR_STANDING_COGNITIVE_STRING)) {
+            if (timestamp > baselineStaticTimestamps[3]) {
+                baselineStatic[3] = value;
+                baselineStaticTimestamps[3] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(TANDEM_STANDING_COGNITIVE_STRING)) {
+            if (timestamp > baselineStaticTimestamps[4]) {
+                baselineStatic[4] = value;
+                baselineStaticTimestamps[4] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(REGULAR_DYNAMIC_STRING)) {
+            if (timestamp > baselineDynamicTimestamps[1]) {
+                baselineDynamic[1] = value;
+                baselineDynamicTimestamps[1] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(TANDEM_DYNAMIC_STRING)) {
+            if (timestamp > baselineDynamicTimestamps[2]) {
+                baselineDynamic[2] = value;
+                baselineDynamicTimestamps[2] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(REGULAR_DYNAMIC_COGNITIVE_STRING)) {
+            if (timestamp > baselineDynamicTimestamps[3]) {
+                baselineDynamic[3] = value;
+                baselineDynamicTimestamps[3] = timestamp;
+            }
+        }
+        else if (testTypeID.equals(TANDEM_DYNAMIC_COGNITIVE_STRING)) {
+            if (timestamp > baselineDynamicTimestamps[4]) {
+                baselineDynamic[4] = value;
+                baselineDynamicTimestamps[4] = timestamp;
+            }
+        }
+        else {
+            isTestTypeCorrect = false;
         }
         return isTestTypeCorrect;
     }
