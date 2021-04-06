@@ -2,13 +2,17 @@ package com.example.dynaswayconcussion.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.dynaswayconcussion.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,6 +23,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CoachActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
@@ -28,6 +35,7 @@ public class CoachActivity extends AppCompatActivity {
     CircularImageView profile_imageview;
 
     LinearLayout connectionsLayout;
+    List<String> athleteUidList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +47,11 @@ public class CoachActivity extends AppCompatActivity {
         profile_imageview = (CircularImageView) findViewById(R.id.home_profile_imageview);
         connectionsLayout = (LinearLayout) findViewById(R.id.linearLayoutAthleteList);
 
+        athleteUidList.add("GT8ODAet7scHJpt9yNCvetnuqTr1");
+        athleteUidList.add("CDevveNn3FMpNcTaRivb2J4AWa62");
+        athleteUidList.add("6uQDOxsPc4Yb1G5LKLI2EoTZ8Lo1");
+
+
         loadProfileInfo();
         addButtons();
     }
@@ -49,17 +62,31 @@ public class CoachActivity extends AppCompatActivity {
         {
             // int btnStyle = R.style.athlete_button;
             // Button btn = new Button(new ContextThemeWrapper(this, btnStyle), null, btnStyle);
+            // btn.setBackgroundColor(getColor(R.color.main_green));
+
             Button btn = new Button(this);
-            btn.setBackgroundColor(getColor(R.color.main_green));
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(36, 36, 36, 36);
-
+            params.setMargins(4, 8, 4, 8);
             btn.setLayoutParams(params);
-            btn.setText("athlete 1");
+
+            btn.setBackgroundTintList(this.getResources().getColorStateList(R.color.main_green));
+            btn.setOnClickListener(btnAthleteClick);
+            btn.setId(i);
+
+            btn.setText("athlete " + i);
             connectionsLayout.addView(btn);
         }
     }
+
+    View.OnClickListener btnAthleteClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(getApplicationContext(),
+                    String.valueOf(v.getId()),
+                    Toast.LENGTH_SHORT).show();
+        }
+    };
 
     private void loadProfileInfo () {
         db.collection("users").document(mAuth.getUid())

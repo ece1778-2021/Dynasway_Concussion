@@ -13,11 +13,13 @@ import android.widget.CalendarView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.dynaswayconcussion.R;
 import com.example.dynaswayconcussion.Tests.DynamicTest.camera.CameraActivity;
 import com.example.dynaswayconcussion.Utils.DateUtils;
+import com.example.dynaswayconcussion.ui.home.TeamsConnectionFragment;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.components.AxisBase;
@@ -56,11 +58,10 @@ public class CalendarFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private String uid;
 
     BarChart barChartStatic;
     BarChart barChartDynamic;
-
-    Random rand = new Random();
 
     double[] baselineStatic = new double[5];
     double[] resultsStatic = new double[5];
@@ -72,12 +73,40 @@ public class CalendarFragment extends Fragment {
     long[] baselineDynamicTimestamps = new long[5];
     long[] resultsDynamicTimestamps = new long[5];
 
+    public CalendarFragment() {
+
+    }
+
+    public static CalendarFragment newInstance(String uid)
+    {
+        CalendarFragment fragment = new CalendarFragment();
+        Bundle args = new Bundle();
+        args.putString("uid", uid);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
+        if (getArguments() != null)
+        {
+            uid = getArguments().getString("uid");
+        }
+        else
+        {
+            uid = mAuth.getCurrentUser().getUid();
+        }
+    }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
 
         CalendarView calendarView = view.findViewById(R.id.calendarView);
         barChartStatic = view.findViewById(R.id.barChartStatic);
@@ -267,7 +296,7 @@ public class CalendarFragment extends Fragment {
                     Log.i("CALENDAR_INFO", document.getId() + " => " + document.getData());
                     double testResult = document.getDouble("value");
                     boolean isBaseline = document.getBoolean("is_baseline");
-                    boolean isFromUser = document.getString("user_uid").equals(mAuth.getCurrentUser().getUid());
+                    boolean isFromUser = document.getString("user_uid").equals(uid);
                     String testType = document.getString("test_type");
                     long timestamp = document.getLong("timestamp");
                     Log.i("CALENDAR_INFO", "Test string type: " + testType);
@@ -290,7 +319,7 @@ public class CalendarFragment extends Fragment {
                                 Log.i("CALENDAR_INFO", document.getId() + " => " + document.getData());
                                 double testResult = document.getDouble("value");
                                 boolean isBaseline = document.getBoolean("is_baseline");
-                                boolean isFromUser = document.getString("user_uid").equals(mAuth.getCurrentUser().getUid());
+                                boolean isFromUser = document.getString("user_uid").equals(uid);
                                 String testType = document.getString("test_type");
                                 long timestamp = document.getLong("timestamp");
                                 if (isBaseline && isFromUser) {
