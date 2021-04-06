@@ -2,11 +2,8 @@ package com.example.dynaswayconcussion.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,7 +14,6 @@ import android.widget.Toast;
 import com.example.dynaswayconcussion.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.api.Distribution;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -34,6 +30,9 @@ public class CoachActivity extends AppCompatActivity {
     TextView hello_textview;
     CircularImageView profile_imageview;
 
+    Button profileCodeButton;
+    Button scanCodeButton;
+
     LinearLayout connectionsLayout;
     List<String> athleteUidList = new ArrayList<>();
 
@@ -46,6 +45,22 @@ public class CoachActivity extends AppCompatActivity {
         hello_textview = (TextView) findViewById(R.id.home_hello_textview);
         profile_imageview = (CircularImageView) findViewById(R.id.home_profile_imageview);
         connectionsLayout = (LinearLayout) findViewById(R.id.linearLayoutAthleteList);
+
+        scanCodeButton = findViewById(R.id.coach_connect_button);
+        scanCodeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        profileCodeButton = findViewById(R.id.coach_profile_code_button);
+        profileCodeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         athleteUidList.add("GT8ODAet7scHJpt9yNCvetnuqTr1");
         athleteUidList.add("CDevveNn3FMpNcTaRivb2J4AWa62");

@@ -115,18 +115,18 @@
                         android:textStyle="bold" />
 
                     <Button
-                        android:id="@+id/home_profile_code"
+                        android:id="@+id/coach_profile_code_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="4dp"
                         android:text="My profile code" />
 
                     <Button
-                        android:id="@+id/home_connect_coach"
+                        android:id="@+id/coach_connect_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="4dp"
-                        android:text="Connect to a coach" />
+                        android:text="Connect to an athlete" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

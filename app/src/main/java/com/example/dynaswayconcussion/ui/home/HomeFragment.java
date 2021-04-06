@@ -3,11 +3,13 @@ package com.example.dynaswayconcussion.ui.home;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -15,14 +17,24 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.dynaswayconcussion.R;
 import com.example.dynaswayconcussion.ui.CircularImageView;
-import com.example.dynaswayconcussion.ui.tests.StaticTestSelectionFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeFragment extends Fragment {
 
@@ -59,8 +71,8 @@ public class HomeFragment extends Fragment {
         btnGetInvolved = (Button)view.findViewById(R.id.home_get_involved_button);
         btnConcussionStats = (Button)view.findViewById(R.id.home_concussion_stats_button);
 
-        btnProfileCode = (Button) view.findViewById(R.id.home_profile_code);
-        btnConnectCoach = (Button) view.findViewById(R.id.home_connect_coach);
+        btnProfileCode = (Button) view.findViewById(R.id.coach_profile_code_button);
+        btnConnectCoach = (Button) view.findViewById(R.id.coach_connect_button);
         btnLogConcussion = (Button) view.findViewById(R.id.home_log_inujry);
         btnAboutApp = (Button) view.findViewById(R.id.home_about_the_app);
 
@@ -113,7 +125,7 @@ public class HomeFragment extends Fragment {
         btnConnectCoach.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startQRScanner();
             }
         });
 
@@ -153,6 +165,77 @@ public class HomeFragment extends Fragment {
                                 .into(profile_imageview);
                     }
                 }
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i("HOME_INFO", "Read QR code");
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if(result != null) {
+            if(result.getContents() == null) {
+                Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_SHORT).show();
+            } else {
+                //Toast.makeText(getActivity(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                setUpConnectionInCloud(result.getContents());
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void startQRScanner() {
+        IntentIntegrator integrator = IntentIntegrator.forSupportFragment(this);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+        integrator.setPrompt("Scan your coach's code");
+        integrator.setCameraId(0);  // Use a specific camera of the device
+        integrator.setBeepEnabled(false);
+        integrator.setBarcodeImageEnabled(true);
+        integrator.initiateScan();
+        //IntentIntegrator.forSupportFragment(this).initiateScan();
+    }
+
+    private void setUpConnectionInCloud(String coachUID) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        if (mAuth.getCurrentUser().getUid().equals(coachUID)) {
+            Toast.makeText(getActivity(), "Code is user's own code", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("user_uid1", coachUID);
+        data.put("user_uid2", mAuth.getCurrentUser().getUid());
+
+        CollectionReference connections = db.collection("connections");
+
+        Query existsQuery = connections.whereEqualTo("user_uid1", coachUID);
+
+        existsQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                if (queryDocumentSnapshots.size() > 0) {
+                    Toast.makeText(getActivity(), "Connection already exists", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    connections.add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Toast.makeText(getActivity(), "Connection completed!", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getActivity(), "Teams connection failed (Errno: 2)", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getActivity(), "Teams connection failed (Errno: 1)", Toast.LENGTH_SHORT).show();
             }
         });
     }
