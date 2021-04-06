@@ -261,7 +261,7 @@ public class CoachHomeFragment extends Fragment implements SwipeRefreshLayout.On
 
         CollectionReference connections = db.collection("connections");
 
-        Query existsQuery = connections.whereEqualTo("user_uid1", mAuth.getCurrentUser().getUid());
+        Query existsQuery = connections.whereEqualTo("user_uid1", mAuth.getCurrentUser().getUid()).whereEqualTo("user_uid2", athleteUID);
 
         existsQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override

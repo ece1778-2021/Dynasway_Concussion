@@ -223,7 +223,7 @@ public class HomeFragment extends Fragment {
 
         CollectionReference connections = db.collection("connections");
 
-        Query existsQuery = connections.whereEqualTo("user_uid1", coachUID);
+        Query existsQuery = connections.whereEqualTo("user_uid1", coachUID).whereEqualTo("user_uid2", mAuth.getCurrentUser().getUid());
 
         existsQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
