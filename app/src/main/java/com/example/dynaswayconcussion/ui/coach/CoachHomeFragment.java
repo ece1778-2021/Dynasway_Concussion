@@ -1,9 +1,11 @@
-package com.example.dynaswayconcussion.ui;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+package com.example.dynaswayconcussion.ui.coach;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dynaswayconcussion.R;
+import com.example.dynaswayconcussion.ui.CircularImageView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,7 +25,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CoachActivity extends AppCompatActivity {
+public class CoachHomeFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -36,17 +39,22 @@ public class CoachActivity extends AppCompatActivity {
     LinearLayout connectionsLayout;
     List<String> athleteUidList = new ArrayList<>();
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_coach);
+    public CoachHomeFragment() {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        hello_textview = (TextView) findViewById(R.id.home_hello_textview);
-        profile_imageview = (CircularImageView) findViewById(R.id.home_profile_imageview);
-        connectionsLayout = (LinearLayout) findViewById(R.id.linearLayoutAthleteList);
+    }
 
-        scanCodeButton = findViewById(R.id.coach_connect_button);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view =  inflater.inflate(R.layout.fragment_coach_home, container, false);
+
+        hello_textview = (TextView) view.findViewById(R.id.home_hello_textview);
+        profile_imageview = (CircularImageView) view.findViewById(R.id.home_profile_imageview);
+        connectionsLayout = (LinearLayout) view.findViewById(R.id.linearLayoutAthleteList);
+
+        scanCodeButton = view.findViewById(R.id.coach_connect_button);
         scanCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,7 +62,7 @@ public class CoachActivity extends AppCompatActivity {
             }
         });
 
-        profileCodeButton = findViewById(R.id.coach_profile_code_button);
+        profileCodeButton = view.findViewById(R.id.coach_profile_code_button);
         profileCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,6 +77,8 @@ public class CoachActivity extends AppCompatActivity {
 
         loadProfileInfo();
         addButtons();
+
+        return view;
     }
 
     private void addButtons()
@@ -79,7 +89,7 @@ public class CoachActivity extends AppCompatActivity {
             // Button btn = new Button(new ContextThemeWrapper(this, btnStyle), null, btnStyle);
             // btn.setBackgroundColor(getColor(R.color.main_green));
 
-            Button btn = new Button(this);
+            Button btn = new Button(getContext());
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(4, 8, 4, 8);
@@ -97,7 +107,7 @@ public class CoachActivity extends AppCompatActivity {
     View.OnClickListener btnAthleteClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Toast.makeText(getApplicationContext(),
+            Toast.makeText(getContext(),
                     String.valueOf(v.getId()),
                     Toast.LENGTH_SHORT).show();
         }

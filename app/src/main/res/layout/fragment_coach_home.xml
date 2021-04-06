@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.coach.CoachActivity">
+    tools:context=".ui.coach.CoachHomeFragment">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/profile_card"
@@ -134,5 +134,6 @@
 
         </LinearLayout>
     </ScrollView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,15 +1,19 @@
 package com.example.dynaswayconcussion;
 
 import android.Manifest;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.dynaswayconcussion.ui.CoachActivity;
+import com.example.dynaswayconcussion.ui.coach.CoachActivity;
+import com.example.dynaswayconcussion.ui.coach.CoachActivityContainer;
+import com.example.dynaswayconcussion.ui.coach.CoachHomeFragment;
+import com.example.dynaswayconcussion.ui.tests.StaticTestSelectionFragment;
+import com.example.dynaswayconcussion.ui.tests.TestsSelectionFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                         boolean is_coach = (Boolean)document.getData().get("is_coach");
                         if (is_coach)
                         {
-                            Intent intent = new Intent(getApplicationContext(), CoachActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), CoachActivityContainer.class);
                             // clear the stack so the coach can't go back to athlete view
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             getApplicationContext().startActivity(intent);

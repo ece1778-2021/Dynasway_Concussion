@@ -14,15 +14,16 @@
 
     <application
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DynaswayConcussion"
-        android:usesCleartextTraffic="true"
-        android:hardwareAccelerated="true">
-        <activity android:name=".ui.CoachActivity" />
+        android:usesCleartextTraffic="true">
+        <activity android:name=".ui.coach.CoachActivityContainer"></activity>
+        <activity android:name=".ui.coach.CoachActivity" />
         <activity android:name=".Tests.DynamicTest.camera.CameraActivity" />
         <activity android:name=".ui.tests.TestActivity" />
         <activity android:name=".ui.tests.TestInstructionsActivity" />
