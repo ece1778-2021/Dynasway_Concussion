@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.dynaswayconcussion.R;
 import com.example.dynaswayconcussion.ui.CircularImageView;
+import com.example.dynaswayconcussion.ui.calendar.CalendarFragment;
 import com.example.dynaswayconcussion.ui.home.TeamsConnectionFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -56,6 +57,9 @@ public class CoachHomeFragment extends Fragment {
     public CoachHomeFragment() {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        athleteUidList.add("GT8ODAet7scHJpt9yNCvetnuqTr1");
+        athleteUidList.add("CDevveNn3FMpNcTaRivb2J4AWa62");
+        athleteUidList.add("6uQDOxsPc4Yb1G5LKLI2EoTZ8Lo1");
     }
 
     @Override
@@ -90,11 +94,6 @@ public class CoachHomeFragment extends Fragment {
             }
         });
 
-        athleteUidList.add("GT8ODAet7scHJpt9yNCvetnuqTr1");
-        athleteUidList.add("CDevveNn3FMpNcTaRivb2J4AWa62");
-        athleteUidList.add("6uQDOxsPc4Yb1G5LKLI2EoTZ8Lo1");
-
-
         loadProfileInfo();
         addButtons();
 
@@ -103,7 +102,7 @@ public class CoachHomeFragment extends Fragment {
 
     private void addButtons()
     {
-        for (int i=0; i < 3; i++)
+        for (int i=0; i < athleteUidList.size(); i++)
         {
             // int btnStyle = R.style.athlete_button;
             // Button btn = new Button(new ContextThemeWrapper(this, btnStyle), null, btnStyle);
@@ -130,6 +129,11 @@ public class CoachHomeFragment extends Fragment {
             Toast.makeText(getContext(),
                     String.valueOf(v.getId()),
                     Toast.LENGTH_SHORT).show();
+
+            CalendarFragment frag = CalendarFragment.newInstance(athleteUidList.get((int)v.getId()));
+            getActivity().getSupportFragmentManager().beginTransaction().replace(android.R.id.content, frag, "tag")
+                    .addToBackStack("backstack")
+                    .commit();
         }
     };
 
