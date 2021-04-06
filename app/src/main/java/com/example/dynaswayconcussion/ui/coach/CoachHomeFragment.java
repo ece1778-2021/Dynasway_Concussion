@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,10 +44,12 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-public class CoachHomeFragment extends Fragment {
+public class CoachHomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+
+    SwipeRefreshLayout swipeRefreshLayout;
 
     TextView hello_textview;
     CircularImageView profile_imageview;
@@ -56,8 +59,6 @@ public class CoachHomeFragment extends Fragment {
 
     LinearLayout connectionsLayout;
     List<String> athleteUidList = new ArrayList<>();
-    List<String> athleteNameDict = new ArrayList<>();
-
     Hashtable<String, String> athleteNameMap = new Hashtable<String, String>();
 
     CollectionReference connectionsRef;
@@ -82,19 +83,10 @@ public class CoachHomeFragment extends Fragment {
         hello_textview = (TextView) view.findViewById(R.id.home_hello_textview);
         profile_imageview = (CircularImageView) view.findViewById(R.id.home_profile_imageview);
         connectionsLayout = (LinearLayout) view.findViewById(R.id.linearLayoutAthleteList);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(CoachHomeFragment.this);
 
-        Query connectionsQuery = connectionsRef.whereEqualTo("user_uid1", mAuth.getCurrentUser().getUid());
-        connectionsQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots)
-                {
-                    if (!athleteUidList.contains(queryDocumentSnapshot.getString("user_uid2")))
-                        athleteUidList.add(queryDocumentSnapshot.getString("user_uid2"));
-                }
-                searchNames();
-            }
-        });
+        searchConnections();
 
         scanCodeButton = view.findViewById(R.id.coach_connect_button);
         scanCodeButton.setOnClickListener(new View.OnClickListener() {
@@ -122,6 +114,22 @@ public class CoachHomeFragment extends Fragment {
         // addButtons();
 
         return view;
+    }
+
+    private void searchConnections()
+    {
+        Query connectionsQuery = connectionsRef.whereEqualTo("user_uid1", mAuth.getCurrentUser().getUid());
+        connectionsQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots)
+                {
+                    if (!athleteUidList.contains(queryDocumentSnapshot.getString("user_uid2")))
+                        athleteUidList.add(queryDocumentSnapshot.getString("user_uid2"));
+                }
+                searchNames();
+            }
+        });
     }
 
     private void searchNames()
@@ -168,31 +176,21 @@ public class CoachHomeFragment extends Fragment {
 
     private void addButtons()
     {
-        for (int i=0; i < athleteUidList.size(); i++)
-        {
-            // int btnStyle = R.style.athlete_button;
-            // Button btn = new Button(new ContextThemeWrapper(this, btnStyle), null, btnStyle);
-            // btn.setBackgroundColor(getColor(R.color.main_green));
+        athleteNameMap.forEach((k, v) -> {
+            addButton(v, k);
+        });
+    }
 
-            Button btn = new Button(getContext());
+    @Override
+    public void onResume() {
+        super.onResume();
+        addButtons();
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(4, 8, 4, 8);
-            btn.setLayoutParams(params);
-
-            btn.setBackgroundTintList(this.getResources().getColorStateList(R.color.main_green));
-            btn.setOnClickListener(btnAthleteClick);
-            btn.setId(i);
-
-            btn.setText("athlete " + i);
-            connectionsLayout.addView(btn);
-        }
     }
 
     View.OnClickListener btnAthleteClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
             CalendarFragment frag = CalendarFragment.newInstance((String) v.getTag());
             getActivity().getSupportFragmentManager().beginTransaction().replace(android.R.id.content, frag, "tag")
                     .addToBackStack("backstack")
@@ -291,5 +289,11 @@ public class CoachHomeFragment extends Fragment {
                 Toast.makeText(getActivity(), "Teams connection failed (Errno: 1)", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onRefresh() {
+        searchConnections();
+        swipeRefreshLayout.setRefreshing(false);
     }
 }
