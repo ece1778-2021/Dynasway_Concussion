@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="athlete_button" parent="Theme.AppCompat.Light">
+        <item name="background">@color/main_green</item>
+        <item name="android:layout_margin">4dp</item>
+    </style>
+</resources>
