@@ -68,7 +68,7 @@ public class CoachHomeFragment extends Fragment implements SwipeRefreshLayout.On
         db = FirebaseFirestore.getInstance();
 
         connectionsRef = db.collection("connections");
-//
+
 //        athleteUidList.add("GT8ODAet7scHJpt9yNCvetnuqTr1");
 //        athleteUidList.add("CDevveNn3FMpNcTaRivb2J4AWa62");
 //        athleteUidList.add("6uQDOxsPc4Yb1G5LKLI2EoTZ8Lo1");
@@ -85,8 +85,6 @@ public class CoachHomeFragment extends Fragment implements SwipeRefreshLayout.On
         connectionsLayout = (LinearLayout) view.findViewById(R.id.linearLayoutAthleteList);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(CoachHomeFragment.this);
-
-        searchConnections();
 
         scanCodeButton = view.findViewById(R.id.coach_connect_button);
         scanCodeButton.setOnClickListener(new View.OnClickListener() {
@@ -125,7 +123,9 @@ public class CoachHomeFragment extends Fragment implements SwipeRefreshLayout.On
                 for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots)
                 {
                     if (!athleteUidList.contains(queryDocumentSnapshot.getString("user_uid2")))
+                    {
                         athleteUidList.add(queryDocumentSnapshot.getString("user_uid2"));
+                    }
                 }
                 searchNames();
             }
@@ -184,8 +184,9 @@ public class CoachHomeFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public void onResume() {
         super.onResume();
-        addButtons();
-
+        athleteUidList.clear();
+        athleteNameMap.clear();
+        searchConnections();
     }
 
     View.OnClickListener btnAthleteClick = new View.OnClickListener() {
