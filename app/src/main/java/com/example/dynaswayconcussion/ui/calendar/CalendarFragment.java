@@ -401,25 +401,25 @@ public class CalendarFragment extends Fragment {
         }
         else if (testTypeID.equals(REGULAR_DYNAMIC_STRING)) {
             if (timestamp > resultsDynamicTimestamps[1]) {
-                resultsDynamic[1] = value;
+                resultsDynamic[1] = value * 31.0 * 28.75 / 100.0;
                 resultsDynamicTimestamps[1] = timestamp;
             }
         }
         else if (testTypeID.equals(TANDEM_DYNAMIC_STRING)) {
             if (timestamp > resultsDynamicTimestamps[2]) {
-                resultsDynamic[2] = value;
+                resultsDynamic[2] = value * 31.0 * 28.75 / 100.0;
                 resultsDynamicTimestamps[2] = timestamp;
             }
         }
         else if (testTypeID.equals(REGULAR_DYNAMIC_COGNITIVE_STRING)) {
             if (timestamp > resultsDynamicTimestamps[3]) {
-                resultsDynamic[3] = value;
+                resultsDynamic[3] = value * 31.0 * 28.75 / 100.0;
                 resultsDynamicTimestamps[3] = timestamp;
             }
         }
         else if (testTypeID.equals(TANDEM_DYNAMIC_COGNITIVE_STRING)) {
             if (timestamp > resultsDynamicTimestamps[4]) {
-                resultsDynamic[4] = value;
+                resultsDynamic[4] = value * 31.0 * 28.75 / 100.0;
                 resultsDynamicTimestamps[4] = timestamp;
             }
         }
@@ -466,25 +466,25 @@ public class CalendarFragment extends Fragment {
         }
         else if (testTypeID.equals(REGULAR_DYNAMIC_STRING)) {
             if (timestamp > baselineDynamicTimestamps[1]) {
-                baselineDynamic[1] = value;
+                baselineDynamic[1] = value * 31.0 * 28.75 / 100.0;
                 baselineDynamicTimestamps[1] = timestamp;
             }
         }
         else if (testTypeID.equals(TANDEM_DYNAMIC_STRING)) {
             if (timestamp > baselineDynamicTimestamps[2]) {
-                baselineDynamic[2] = value;
+                baselineDynamic[2] = value * 31.0 * 28.75 / 100.0;
                 baselineDynamicTimestamps[2] = timestamp;
             }
         }
         else if (testTypeID.equals(REGULAR_DYNAMIC_COGNITIVE_STRING)) {
             if (timestamp > baselineDynamicTimestamps[3]) {
-                baselineDynamic[3] = value;
+                baselineDynamic[3] = value * 31.0 * 28.75 / 100.0;
                 baselineDynamicTimestamps[3] = timestamp;
             }
         }
         else if (testTypeID.equals(TANDEM_DYNAMIC_COGNITIVE_STRING)) {
             if (timestamp > baselineDynamicTimestamps[4]) {
-                baselineDynamic[4] = value;
+                baselineDynamic[4] = value * 31.0 * 28.75 / 100.0;
                 baselineDynamicTimestamps[4] = timestamp;
             }
         }
